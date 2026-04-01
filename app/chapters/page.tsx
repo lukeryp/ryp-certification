@@ -26,8 +26,8 @@ export default function ChaptersPage() {
     <div className="min-h-screen pb-20 md:pb-0">
       <Nav />
       <main className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">Chapters</h1>
-        <p className="text-gray-500 text-sm mb-6">17 chapters. 90% to pass each. Complete all for Level 1 Certification.</p>
+        <h1 className="text-2xl font-bold text-[#e8e4de] mb-2">Chapters</h1>
+        <p className="text-[#6b6b6b] text-sm mb-6">17 chapters. 90% to pass each. Complete all for Level 1 Certification.</p>
 
         <div className="space-y-3">
           {CHAPTERS.map(ch => {
@@ -39,28 +39,28 @@ export default function ChaptersPage() {
               <Link key={ch.number} href={`/chapters/${ch.number}`}>
                 <div className={`p-5 rounded-xl border transition-colors mb-3 ${
                   passed
-                    ? 'bg-green-900/20 border-green-800/40'
+                    ? 'bg-[#c9b99a]/10 border-[#c9b99a]/30'
                     : attempted
-                    ? 'bg-[#111827] border-amber-800/30'
-                    : 'bg-[#111827] border-gray-800 hover:border-gray-700'
+                    ? 'bg-[#141414] border-amber-800/30'
+                    : 'bg-[#141414] border-[#2a2a2a] hover:border-[#3a3a3a]'
                 }`}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-medium ${passed ? 'text-green-500' : 'text-gray-500'}`}>
+                        <span className={`text-xs font-medium ${passed ? 'text-[#c9b99a]' : 'text-[#6b6b6b]'}`}>
                           Chapter {ch.number}
                         </span>
-                        {passed && <span className="text-xs bg-green-900/50 text-green-400 px-2 py-0.5 rounded-full">Passed</span>}
+                        {passed && <span className="text-xs bg-[#c9b99a]/15 text-[#c9b99a] px-2 py-0.5 rounded-full">Passed</span>}
                         {attempted && !passed && result && (
                           <span className="text-xs bg-amber-900/30 text-amber-400 px-2 py-0.5 rounded-full">
                             Best: {result.bestScore}/10
                           </span>
                         )}
                       </div>
-                      <p className="font-medium text-gray-200">{ch.title}</p>
-                      <p className="text-sm text-gray-500 mt-1">{ch.summary}</p>
+                      <p className="font-medium text-[#e8e4de]">{ch.title}</p>
+                      <p className="text-sm text-[#6b6b6b] mt-1">{ch.summary}</p>
                     </div>
-                    <span className="text-gray-600 ml-4">&#8250;</span>
+                    <span className="text-[#6b6b6b] ml-4">&#8250;</span>
                   </div>
                 </div>
               </Link>

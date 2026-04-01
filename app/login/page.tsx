@@ -42,30 +42,30 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-green-500 font-bold text-3xl mb-2">RYP GOLF</div>
-          <h1 className="text-xl text-gray-300">Level 1 Certification</h1>
-          <p className="text-gray-500 text-sm mt-2">The Golf Textbook — Instructor Education</p>
+          <div className="text-[#c9b99a] font-bold text-3xl mb-2 font-serif">RYP GOLF</div>
+          <h1 className="text-xl text-[#e8e4de]">Level 1 Certification</h1>
+          <p className="text-[#6b6b6b] text-sm mt-2">The Golf Textbook — Instructor Education</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Name</label>
+            <label className="block text-sm text-[#6b6b6b] mb-1">Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Your full name"
-              className="w-full px-4 py-3 bg-[#111827] border border-gray-700 rounded-lg text-gray-200 placeholder-gray-600 focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-4 py-3 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#e8e4de] placeholder-[#6b6b6b] focus:outline-none focus:border-[#c9b99a] transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+            <label className="block text-sm text-[#6b6b6b] mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 bg-[#111827] border border-gray-700 rounded-lg text-gray-200 placeholder-gray-600 focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-4 py-3 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#e8e4de] placeholder-[#6b6b6b] focus:outline-none focus:border-[#c9b99a] transition-colors"
             />
           </div>
 
@@ -75,15 +75,15 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+            className="w-full py-3 bg-[#c9b99a] hover:bg-[#b5a48a] text-[#0a0a0a] font-medium rounded-lg transition-colors"
           >
             Enter Dashboard
           </button>
         </form>
 
-        <div className="mt-8 p-4 bg-[#111827] rounded-lg border border-gray-800">
-          <p className="text-xs text-gray-500 mb-2">Interlachen Beta Cohort</p>
-          <div className="text-xs text-gray-600 space-y-1">
+        <div className="mt-8 p-4 bg-[#141414] rounded-lg border border-[#2a2a2a]">
+          <p className="text-xs text-[#6b6b6b] mb-2">Interlachen Beta Cohort</p>
+          <div className="text-xs text-[#6b6b6b] space-y-1">
             <p>Nathan Ollhoff · Blaize Hauge · Nick Dittrich</p>
             <p>Sam Nodler · Jack O&apos;Brien · Adam Wood · Kyle Berg</p>
           </div>

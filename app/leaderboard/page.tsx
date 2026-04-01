@@ -31,12 +31,12 @@ export default function LeaderboardPage() {
     <div className="min-h-screen pb-20 md:pb-0">
       <Nav />
       <main className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">Interlachen Cohort</h1>
-        <p className="text-gray-500 text-sm mb-6">Everyone sees everyone. Progress together.</p>
+        <h1 className="text-2xl font-bold text-[#e8e4de] mb-2">Interlachen Cohort</h1>
+        <p className="text-[#6b6b6b] text-sm mb-6">Everyone sees everyone. Progress together.</p>
 
         {sorted.length === 0 ? (
-          <div className="bg-[#111827] rounded-xl border border-gray-800 p-8 text-center">
-            <p className="text-gray-500">No cohort members yet. Progress will appear as people log in and take quizzes.</p>
+          <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
+            <p className="text-[#6b6b6b]">No cohort members yet. Progress will appear as people log in and take quizzes.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -47,7 +47,7 @@ export default function LeaderboardPage() {
 
               return (
                 <div key={entry.user.id} className={`rounded-xl border p-5 ${
-                  isMe ? 'bg-green-900/10 border-green-800/40' : 'bg-[#111827] border-gray-800'
+                  isMe ? 'bg-[#c9b99a]/8 border-[#c9b99a]/30' : 'bg-[#141414] border-[#2a2a2a]'
                 }`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -55,21 +55,21 @@ export default function LeaderboardPage() {
                         rank === 0 ? 'bg-yellow-600 text-yellow-100' :
                         rank === 1 ? 'bg-gray-500 text-gray-100' :
                         rank === 2 ? 'bg-amber-700 text-amber-100' :
-                        'bg-gray-800 text-gray-400'
+                        'bg-[#2a2a2a] text-[#6b6b6b]'
                       }`}>
                         {rank + 1}
                       </span>
                       <div>
-                        <p className="font-medium text-gray-200">
+                        <p className="font-medium text-[#e8e4de]">
                           {entry.user.name}
-                          {isMe && <span className="text-green-500 text-xs ml-2">(you)</span>}
+                          {isMe && <span className="text-[#c9b99a] text-xs ml-2">(you)</span>}
                         </p>
-                        <p className="text-xs text-gray-600">{entry.user.email}</p>
+                        <p className="text-xs text-[#6b6b6b]">{entry.user.email}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-gray-200">{comp}%</p>
-                      <p className="text-xs text-gray-500">{passedCount}/17</p>
+                      <p className="text-lg font-bold text-[#e8e4de]">{comp}%</p>
+                      <p className="text-xs text-[#6b6b6b]">{passedCount}/17</p>
                     </div>
                   </div>
 
@@ -82,17 +82,17 @@ export default function LeaderboardPage() {
                           key={ch.number}
                           title={`Ch ${ch.number}: ${ch.title} — ${result?.passed ? 'Passed' : result?.attempts > 0 ? `Best: ${result.bestScore}/10` : 'Not started'}`}
                           className={`flex-1 h-2 rounded-full ${
-                            result?.passed ? 'bg-green-500' :
+                            result?.passed ? 'bg-[#c9b99a]' :
                             result?.attempts > 0 ? 'bg-amber-500' :
-                            'bg-gray-800'
+                            'bg-[#2a2a2a]'
                           }`}
                         />
                       );
                     })}
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span className="text-[10px] text-gray-600">Ch 0</span>
-                    <span className="text-[10px] text-gray-600">Ch 16</span>
+                    <span className="text-[10px] text-[#6b6b6b]">Ch 0</span>
+                    <span className="text-[10px] text-[#6b6b6b]">Ch 16</span>
                   </div>
                 </div>
               );
