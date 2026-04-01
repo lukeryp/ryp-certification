@@ -35,19 +35,32 @@ export default function Dashboard() {
       <Nav />
       <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-100">Welcome, {user.name.split(' ')[0]}</h1>
-          <p className="text-gray-500 text-sm">Level 1 Certification Progress</p>
+          <h1 className="text-2xl font-bold text-[#e8e4de]">Welcome, {user.name.split(' ')[0]}</h1>
+          <p className="text-[#6b6b6b] text-sm">Level 1 Certification Progress</p>
+        </div>
+
+        {/* Textbook PDF link */}
+        <div className="mb-6">
+          <a
+            href="https://rypgolf.com/textbook.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-[#c9b99a] hover:text-[#e8e4de] transition-colors"
+          >
+            <span>↓</span>
+            <span>Download The Golf Textbook (Latest Draft)</span>
+          </a>
         </div>
 
         {/* Progress ring */}
-        <div className="bg-[#111827] rounded-xl border border-gray-800 p-6 mb-6">
+        <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-6 mb-6">
           <div className="flex items-center gap-6">
             <div className="relative w-24 h-24 flex-shrink-0">
               <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#1f2937" strokeWidth="8" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" strokeWidth="8" />
                 <circle
                   cx="50" cy="50" r="42" fill="none"
-                  stroke={completion === 100 ? '#22c55e' : '#3b82f6'}
+                  stroke="#c9b99a"
                   strokeWidth="8"
                   strokeDasharray={`${completion * 2.64} 264`}
                   strokeLinecap="round"
@@ -58,31 +71,31 @@ export default function Dashboard() {
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-100">{passedCount}/17</div>
-              <div className="text-gray-500 text-sm">Chapters Passed</div>
-              <div className="text-gray-600 text-xs mt-1">{totalAttempts} total quiz attempts</div>
+              <div className="text-3xl font-bold text-[#e8e4de]">{passedCount}/17</div>
+              <div className="text-[#6b6b6b] text-sm">Chapters Passed</div>
+              <div className="text-[#6b6b6b] text-xs mt-1">{totalAttempts} total quiz attempts</div>
             </div>
           </div>
           {completion === 100 && (
-            <div className="mt-4 p-3 bg-green-900/30 border border-green-800 rounded-lg text-center">
-              <span className="text-green-400 font-medium">Level 1 Certified</span>
+            <div className="mt-4 p-3 bg-[#c9b99a]/10 border border-[#c9b99a]/30 rounded-lg text-center">
+              <span className="text-[#c9b99a] font-medium">Level 1 Certified</span>
             </div>
           )}
         </div>
 
         {nextChapter && (
           <Link href={`/chapters/${nextChapter.number}`} className="block mb-6">
-            <div className="bg-[#111827] rounded-xl border border-gray-800 p-5 hover:border-green-800 transition-colors">
-              <p className="text-xs text-green-500 font-medium mb-1">CONTINUE</p>
-              <p className="text-lg font-medium text-gray-200">
+            <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-5 hover:border-[#c9b99a]/40 transition-colors">
+              <p className="text-xs text-[#c9b99a] font-medium mb-1">CONTINUE</p>
+              <p className="text-lg font-medium text-[#e8e4de]">
                 Chapter {nextChapter.number}: {nextChapter.title}
               </p>
-              <p className="text-sm text-gray-500 mt-1">{nextChapter.summary}</p>
+              <p className="text-sm text-[#6b6b6b] mt-1">{nextChapter.summary}</p>
             </div>
           </Link>
         )}
 
-        <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">All Chapters</h2>
+        <h2 className="text-sm font-medium text-[#6b6b6b] uppercase tracking-wider mb-3">All Chapters</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CHAPTERS.map(ch => {
             const result = progress.chapterResults[ch.number];
@@ -91,17 +104,17 @@ export default function Dashboard() {
               <Link key={ch.number} href={`/chapters/${ch.number}`}>
                 <div className={`p-4 rounded-lg border transition-colors ${
                   status === 'passed'
-                    ? 'bg-green-900/20 border-green-800/50'
+                    ? 'bg-[#c9b99a]/10 border-[#c9b99a]/30'
                     : status === 'attempted'
                     ? 'bg-amber-900/10 border-amber-800/30'
-                    : 'bg-[#111827] border-gray-800 hover:border-gray-700'
+                    : 'bg-[#141414] border-[#2a2a2a] hover:border-[#3a3a3a]'
                 }`}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500">Ch. {ch.number}</span>
-                    {status === 'passed' && <span className="text-green-500 text-sm">&#10003;</span>}
+                    <span className="text-xs text-[#6b6b6b]">Ch. {ch.number}</span>
+                    {status === 'passed' && <span className="text-[#c9b99a] text-sm">&#10003;</span>}
                     {status === 'attempted' && result && <span className="text-amber-500 text-xs">{result.bestScore}/10</span>}
                   </div>
-                  <p className="font-medium text-gray-200 text-sm">{ch.title}</p>
+                  <p className="font-medium text-[#e8e4de] text-sm">{ch.title}</p>
                 </div>
               </Link>
             );

@@ -19,12 +19,12 @@ export default function Nav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#111827] border-t border-gray-800 z-50 md:relative md:border-t-0 md:border-b">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#141414] border-t border-[#2a2a2a] z-50 md:relative md:border-t-0 md:border-b">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center justify-between">
           <div className="hidden md:flex items-center gap-2 py-4">
-            <span className="text-green-500 font-bold text-lg">RYP</span>
-            <span className="text-gray-400 text-sm">Level 1 Certification</span>
+            <span className="text-[#c9b99a] font-bold text-lg font-serif">RYP</span>
+            <span className="text-[#6b6b6b] text-sm">Level 1 Certification</span>
           </div>
           <div className="flex items-center gap-1 w-full md:w-auto justify-around md:justify-end">
             {links.map(link => (
@@ -33,8 +33,8 @@ export default function Nav() {
                 href={link.href}
                 className={`flex flex-col items-center py-3 px-4 text-xs transition-colors ${
                   pathname === link.href
-                    ? 'text-green-500'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'text-[#c9b99a]'
+                    : 'text-[#6b6b6b] hover:text-[#e8e4de]'
                 }`}
               >
                 <span className="text-lg mb-0.5">{link.icon}</span>
@@ -43,7 +43,7 @@ export default function Nav() {
             ))}
             <button
               onClick={() => { logout(); router.push('/login'); }}
-              className="flex flex-col items-center py-3 px-4 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              className="flex flex-col items-center py-3 px-4 text-xs text-[#6b6b6b] hover:text-[#e8e4de] transition-colors"
             >
               <span className="text-lg mb-0.5">◇</span>
               Sign Out
