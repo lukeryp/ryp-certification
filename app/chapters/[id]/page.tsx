@@ -7,6 +7,7 @@ import Nav from '../../components/Nav';
 import { getCurrentUser, getUserProgress, saveQuizAttempt } from '../../lib/storage';
 import { CHAPTERS } from '../../lib/chapters';
 import { getChapterQuestions, PASS_THRESHOLD } from '../../lib/questions';
+import { getChapterEssayQuestions } from '../../lib/essay-questions';
 import { UserProfile, Question } from '../../lib/types';
 
 type Mode = 'study' | 'quiz' | 'results';
@@ -25,6 +26,7 @@ export default function ChapterPage() {
 
   const chapter = CHAPTERS.find(ch => ch.number === chapterId);
   const questions = getChapterQuestions(chapterId);
+  const essayQuestions = getChapterEssayQuestions(chapterId);
 
   useEffect(() => {
     const u = getCurrentUser();
@@ -94,7 +96,7 @@ export default function ChapterPage() {
         </div>
 
         {/* Mode tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <button
             onClick={() => setMode('study')}
             className={`px-4 py-2 rounded-lg text-sm transition-colors ${
@@ -111,6 +113,13 @@ export default function ChapterPage() {
           >
             {submitted ? 'Retake Quiz' : 'Take Quiz'}
           </button>
+          {essayQuestions.length > 0 && chResult?.passed && (
+            <Link href={`/chapters/${chapterId}/essay`}>
+              <button className="px-4 py-2 rounded-lg text-sm bg-[#111827] text-green-400 border border-green-900 hover:border-green-700 transition-colors">
+                Discussion Questions
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Study mode */}
@@ -279,6 +288,23 @@ export default function ChapterPage() {
                 </button>
               </Link>
             </div>
+
+            {essayQuestions.length > 0 && (
+              <div className="mt-4">
+                {chResult?.passed ? (
+                  <Link href={`/chapters/${chapterId}/essay`}>
+                    <button className="w-full py-3 bg-[#111827] border border-green-800 text-green-400 font-medium rounded-lg hover:bg-green-900/20 transition-colors flex items-center justify-center gap-2">
+                      <span>Discussion Questions</span>
+                      <span className="text-xs text-gray-500">({essayQuestions.length} questions · required for full certification)</span>
+                    </button>
+                  </Link>
+                ) : (
+                  <div className="w-full py-3 bg-[#111827] border border-gray-800 text-gray-600 font-medium rounded-lg text-center text-sm cursor-not-allowed">
+                    Discussion Questions — pass the quiz to unlock
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </main>

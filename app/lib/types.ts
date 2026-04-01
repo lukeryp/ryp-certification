@@ -41,4 +41,33 @@ export interface ChapterResult {
   passed: boolean;
   attempts: number;
   lastAttempt: string | null;
+  essayAverageScore: number;
+  essayCompletedCount: number;
+}
+
+export interface EssayQuestion {
+  id: string; // "ch0_essay_1"
+  chapter: number;
+  title: string;
+  prompt: string;
+  wordLimit: number;
+  gradingCriteria: string[];
+}
+
+export interface EssayAttempt {
+  id: string;
+  userId: string;
+  chapter: number;
+  questionId: string;
+  response: string;
+  score: number; // 1-10
+  feedback: string;
+  suggestions: string;
+  timestamp: string;
+}
+
+export interface GradeResponse {
+  score: number;
+  feedback: string;
+  suggestions: string;
 }

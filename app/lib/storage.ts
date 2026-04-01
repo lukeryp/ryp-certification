@@ -1,4 +1,4 @@
-import { QuizAttempt, UserProfile, UserProgress, ChapterResult } from './types';
+import { QuizAttempt, UserProfile, UserProgress, ChapterResult, EssayAttempt } from './types';
 
 const STORAGE_PREFIX = 'ryp_cert_';
 
@@ -48,9 +48,37 @@ export function getQuizAttempts(userId: string): QuizAttempt[] {
   return data ? JSON.parse(data) : [];
 }
 
+// Essay attempts
+export function saveEssayAttempt(attempt: EssayAttempt): void {
+  const attempts = getEssayAttempts(attempt.userId);
+  attempts.push(attempt);
+  localStorage.setItem(
+    STORAGE_PREFIX + 'essay_' + attempt.userId,
+    JSON.stringify(attempts)
+  );
+}
+
+export function getEssayAttempts(userId: string): EssayAttempt[] {
+  if (typeof window === 'undefined') return [];
+  const data = localStorage.getItem(STORAGE_PREFIX + 'essay_' + userId);
+  return data ? JSON.parse(data) : [];
+}
+
+export function getBestEssayAttempts(userId: string, chapter: number): Record<string, EssayAttempt> {
+  const attempts = getEssayAttempts(userId).filter(a => a.chapter === chapter);
+  const best: Record<string, EssayAttempt> = {};
+  for (const attempt of attempts) {
+    if (!best[attempt.questionId] || attempt.score > best[attempt.questionId].score) {
+      best[attempt.questionId] = attempt;
+    }
+  }
+  return best;
+}
+
 // Progress tracking
 export function getUserProgress(userId: string): UserProgress {
   const attempts = getQuizAttempts(userId);
+  const essayAttempts = getEssayAttempts(userId);
   const chapterResults: Record<number, ChapterResult> = {};
 
   for (let ch = 0; ch <= 16; ch++) {
@@ -60,12 +88,28 @@ export function getUserProgress(userId: string): UserProgress {
       return best;
     }, null);
 
+    // Essay stats: best score per question
+    const chapterEssays = essayAttempts.filter(a => a.chapter === ch);
+    const bestByQuestion: Record<string, number> = {};
+    for (const ea of chapterEssays) {
+      if (!bestByQuestion[ea.questionId] || ea.score > bestByQuestion[ea.questionId]) {
+        bestByQuestion[ea.questionId] = ea.score;
+      }
+    }
+    const completedQuestions = Object.values(bestByQuestion);
+    const essayCompletedCount = completedQuestions.length;
+    const essayAverageScore = essayCompletedCount > 0
+      ? completedQuestions.reduce((sum, s) => sum + s, 0) / essayCompletedCount
+      : 0;
+
     chapterResults[ch] = {
       chapter: ch,
       bestScore: bestAttempt?.score ?? 0,
       passed: bestAttempt?.passed ?? false,
       attempts: chapterAttempts.length,
       lastAttempt: bestAttempt?.timestamp ?? null,
+      essayAverageScore: Math.round(essayAverageScore * 10) / 10,
+      essayCompletedCount,
     };
   }
 
