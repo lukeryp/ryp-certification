@@ -1,0 +1,87 @@
+import { QuizAttempt, UserProfile, UserProgress, ChapterResult } from './types';
+
+const STORAGE_PREFIX = 'ryp_cert_';
+
+// User management
+export function getCurrentUser(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  const data = localStorage.getItem(STORAGE_PREFIX + 'current_user');
+  return data ? JSON.parse(data) : null;
+}
+
+export function setCurrentUser(user: UserProfile): void {
+  localStorage.setItem(STORAGE_PREFIX + 'current_user', JSON.stringify(user));
+  // Also add to users list
+  const users = getAllUsers();
+  const existing = users.findIndex(u => u.id === user.id);
+  if (existing >= 0) {
+    users[existing] = user;
+  } else {
+    users.push(user);
+  }
+  localStorage.setItem(STORAGE_PREFIX + 'users', JSON.stringify(users));
+}
+
+export function getAllUsers(): UserProfile[] {
+  if (typeof window === 'undefined') return [];
+  const data = localStorage.getItem(STORAGE_PREFIX + 'users');
+  return data ? JSON.parse(data) : [];
+}
+
+export function logout(): void {
+  localStorage.removeItem(STORAGE_PREFIX + 'current_user');
+}
+
+// Quiz attempts
+export function saveQuizAttempt(attempt: QuizAttempt): void {
+  const attempts = getQuizAttempts(attempt.userId);
+  attempts.push(attempt);
+  localStorage.setItem(
+    STORAGE_PREFIX + 'attempts_' + attempt.userId,
+    JSON.stringify(attempts)
+  );
+}
+
+export function getQuizAttempts(userId: string): QuizAttempt[] {
+  if (typeof window === 'undefined') return [];
+  const data = localStorage.getItem(STORAGE_PREFIX + 'attempts_' + userId);
+  return data ? JSON.parse(data) : [];
+}
+
+// Progress tracking
+export function getUserProgress(userId: string): UserProgress {
+  const attempts = getQuizAttempts(userId);
+  const chapterResults: Record<number, ChapterResult> = {};
+
+  for (let ch = 0; ch <= 16; ch++) {
+    const chapterAttempts = attempts.filter(a => a.chapter === ch);
+    const bestAttempt = chapterAttempts.reduce<QuizAttempt | null>((best, curr) => {
+      if (!best || curr.score > best.score) return curr;
+      return best;
+    }, null);
+
+    chapterResults[ch] = {
+      chapter: ch,
+      bestScore: bestAttempt?.score ?? 0,
+      passed: bestAttempt?.passed ?? false,
+      attempts: chapterAttempts.length,
+      lastAttempt: bestAttempt?.timestamp ?? null,
+    };
+  }
+
+  return { userId, chapterResults };
+}
+
+export function getAllProgress(): { user: UserProfile; progress: UserProgress }[] {
+  const users = getAllUsers();
+  return users.map(user => ({
+    user,
+    progress: getUserProgress(user.id),
+  }));
+}
+
+export function getCompletionPercentage(progress: UserProgress): number {
+  const total = 17; // chapters 0-16
+  const passed = Object.values(progress.chapterResults).filter(r => r.passed).length;
+  return Math.round((passed / total) * 100);
+}
