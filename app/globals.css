@@ -3,18 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --background: #0d0d0d;
-  --foreground: #f0f0f0;
+  --background: #0a0a0a;
+  --foreground: #f0ede8;
   --card: rgba(255, 255, 255, 0.03);
   --card-border: rgba(255, 255, 255, 0.08);
   --green: #00af51;
-  --green-dim: rgba(0, 175, 81, 0.15);
-  --green-border: rgba(0, 175, 81, 0.3);
+  --green-dim: rgba(0, 175, 81, 0.12);
+  --green-border: rgba(0, 175, 81, 0.25);
   --yellow: #f4ee19;
-  --yellow-dim: rgba(244, 238, 25, 0.1);
-  --yellow-border: rgba(244, 238, 25, 0.3);
-  --muted: #6b7280;
-  --muted-light: #9ca3af;
+  --yellow-dim: rgba(244, 238, 25, 0.08);
+  --yellow-border: rgba(244, 238, 25, 0.25);
+  --muted: #666;
+  --muted-light: #999;
+  --cream: #c8bfb0;
+  --white: #f0ede8;
 }
 
 body {
@@ -27,10 +29,15 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #0d0d0d; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+/* Scrollbar — thicker and easier to grab */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 5px;
+  border: 2px solid #111;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
 
 /* Glass morphism card */
 .glass {

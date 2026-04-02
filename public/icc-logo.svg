@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" fill="none">
+  <!-- Left C shape (opens right) -->
+  <path d="
+    M 60 80
+    L 60 50
+    L 130 50
+    L 165 80
+    L 130 80
+    L 100 80
+    L 100 340
+    L 130 340
+    L 165 340
+    L 130 370
+    L 60 370
+    L 60 340
+    L 60 80
+    Z
+  " fill="currentColor"/>
+  <!-- Cutout for left C opening -->
+  <path d="
+    M 100 100
+    L 155 100
+    L 155 120
+    L 120 120
+    L 120 300
+    L 155 300
+    L 155 320
+    L 100 320
+    Z
+  " fill="black"/>
+
+  <!-- Center I bar with diamond tips -->
+  <path d="
+    M 160 10
+    L 175 35
+    L 175 385
+    L 160 410
+    L 145 385
+    L 145 35
+    Z
+  " fill="currentColor"/>
+
+  <!-- Right C shape (opens left, mirror of left) -->
+  <path d="
+    M 260 80
+    L 260 50
+    L 190 50
+    L 155 80
+    L 190 80
+    L 220 80
+    L 220 340
+    L 190 340
+    L 155 340
+    L 190 370
+    L 260 370
+    L 260 340
+    L 260 80
+    Z
+  " fill="currentColor"/>
+  <!-- Cutout for right C opening -->
+  <path d="
+    M 220 100
+    L 165 100
+    L 165 120
+    L 200 120
+    L 200 300
+    L 165 300
+    L 165 320
+    L 220 320
+    Z
+  " fill="black"/>
+</svg>

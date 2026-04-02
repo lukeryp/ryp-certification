@@ -1,215 +1,220 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0d0d0d] relative overflow-hidden">
-      {/* Background grid */}
-      <div
-        className="absolute inset-0 pointer-events-none"
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Subtle noise texture overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
-          backgroundImage: `linear-gradient(rgba(0,175,81,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,175,81,0.04) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+          backgroundSize: '128px 128px',
         }}
       />
 
-      {/* Glow orbs */}
-      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(0,175,81,0.08) 0%, transparent 70%)' }} />
-      <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(244,238,25,0.06) 0%, transparent 70%)' }} />
+      <div className="relative z-10 max-w-4xl mx-auto px-5 py-14 sm:py-20">
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:py-20">
-        {/* Header */}
-        <div className="text-center mb-16 animate-fade-up">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
-            style={{ background: 'rgba(0,175,81,0.1)', border: '1px solid rgba(0,175,81,0.25)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00af51]" style={{ animation: 'pulse 2s infinite' }} />
-            <span className="text-[#00af51] text-xs font-medium tracking-widest uppercase">Junior Golf · Staff Certification Platform</span>
+        {/* ── HEADER ─────────────────────────────────────────────── */}
+        <div className="text-center mb-14">
+
+          {/* ICC Logo */}
+          <div className="flex justify-center mb-7">
+            <div className="relative">
+              <Image
+                src="/icc-logo.png"
+                alt="Interlachen Country Club"
+                width={88}
+                height={88}
+                priority
+                className="opacity-90"
+                style={{ objectFit: 'contain' }}
+              />
+            </div>
           </div>
 
-          {/* ICC Diamond Monogram */}
-          <div className="flex justify-center mb-6">
-            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polygon points="36,2 70,36 36,70 2,36" fill="none" stroke="#00af51" strokeWidth="2" opacity="0.4"/>
-              <text x="36" y="46" textAnchor="middle" fontSize="28" fontWeight="900" fill="#00af51" fontFamily="Georgia, serif" opacity="0.9">ICC</text>
-              <text x="36" y="76" textAnchor="middle" fontSize="10" fontWeight="600" fill="#6b7280" fontFamily="Georgia, serif" letterSpacing="3">1909</text>
-            </svg>
+          {/* Rule */}
+          <div className="flex items-center justify-center gap-4 mb-5">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-[rgba(255,255,255,0.15)]" />
+            <span className="text-[10px] font-semibold tracking-[0.35em] uppercase text-[#666]">Est. 1909</span>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-[rgba(255,255,255,0.15)]" />
           </div>
-          <h1 className="text-5xl sm:text-7xl font-black mb-3 tracking-tight leading-none"
+
+          <h1 className="text-4xl sm:text-5xl font-black text-[#f0ede8] mb-2 tracking-tight leading-none"
             style={{ fontFamily: 'var(--font-raleway)' }}>
-            <span style={{
-              background: 'linear-gradient(135deg, #00af51, #00d466)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>Interlachen</span>
+            Interlachen
           </h1>
-          <h2 className="text-xl sm:text-2xl font-light text-[#9ca3af] tracking-wide"
-            style={{ fontFamily: 'var(--font-raleway)' }}>
+          <p className="text-base sm:text-lg font-light tracking-widest text-[#666] uppercase mb-1"
+            style={{ fontFamily: 'var(--font-raleway)', letterSpacing: '0.25em' }}>
+            Country Club
+          </p>
+          <p className="text-sm text-[#555] mt-3" style={{ fontFamily: 'var(--font-work-sans)' }}>
             Junior Golf Staff Certification
-          </h2>
+          </p>
         </div>
 
-        {/* Level cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        {/* ── LEVEL CARDS ───────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
 
           {/* L1 */}
-          <Link href="/l1">
-            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
-              style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 1</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(0,175,81,0.1)', color: '#00af51', border: '1px solid rgba(0,175,81,0.2)' }}>
+          <div className="rounded-2xl overflow-hidden"
+            style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#555]">Level 1</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#777', border: '1px solid rgba(255,255,255,0.1)' }}>
                   Open
                 </span>
               </div>
-              <div className="text-4xl font-black mb-2" style={{
-                fontFamily: 'var(--font-raleway)',
-                background: 'linear-gradient(135deg, #00af51, #00d466)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
+
+              <div className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'var(--font-raleway)', letterSpacing: '-0.02em' }}>
                 JGH
               </div>
-              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+              <h3 className="text-base font-bold text-[#e8e5e0] mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
                 Junior Golf Helper
               </h3>
-              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
+              <p className="text-[13px] text-[#555] leading-relaxed mb-5" style={{ fontFamily: 'var(--font-work-sans)' }}>
                 For Meadowbrook Tuesday helpers and volunteers. Safety, communication, setup, and game facilitation.
               </p>
-              <div className="flex flex-wrap gap-1.5">
+
+              <div className="flex flex-wrap gap-1.5 mb-6">
                 {['Safety', 'Communication', 'Setup', 'Games'].map(tag => (
-                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full text-[#9ca3af]"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full text-[#555]"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-          </Link>
 
-          {/* L2 */}
-          <Link href="/l2">
-            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
-              style={{
-                background: 'rgba(0,175,81,0.04)',
-                border: '1px solid rgba(0,175,81,0.2)',
-              }}>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 2</span>
+            <div className="px-6 pb-5 flex flex-col gap-2">
+              <Link href="/l1/exam">
+                <button className="w-full py-2.5 rounded-xl text-sm font-bold bg-white text-[#0a0a0a] hover:bg-[#f0ede8] transition-colors">
+                  Take Exam →
+                </button>
+              </Link>
+              <Link href="/l1" className="text-center text-xs text-[#444] hover:text-[#888] transition-colors py-1">
+                Study materials
+              </Link>
+            </div>
+          </div>
+
+          {/* L2 — Featured */}
+          <div className="rounded-2xl overflow-hidden ring-1 ring-[rgba(255,255,255,0.12)]"
+            style={{ background: '#141414' }}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#555]">Level 2</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-                  style={{ background: 'rgba(0,175,81,0.15)', color: '#00af51', border: '1px solid rgba(0,175,81,0.35)' }}>
+                  style={{ background: 'rgba(0,175,81,0.12)', color: '#00af51', border: '1px solid rgba(0,175,81,0.25)' }}>
                   Featured
                 </span>
               </div>
-              <div className="text-4xl font-black mb-2" style={{
-                fontFamily: 'var(--font-raleway)',
-                background: 'linear-gradient(135deg, #00af51, #00d466)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
+
+              <div className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'var(--font-raleway)', letterSpacing: '-0.02em' }}>
                 ICC
               </div>
-              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+              <h3 className="text-base font-bold text-[#e8e5e0] mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
                 Instructor Certification
               </h3>
-              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
-                Complete junior golf instruction methodology for Interlachen instructors. 13+ modules including FORGE drills and games library.
+              <p className="text-[13px] text-[#555] leading-relaxed mb-5" style={{ fontFamily: 'var(--font-work-sans)' }}>
+                Complete junior instruction methodology for Interlachen instructors. 14 modules including FORGE drills and games library.
               </p>
-              <div className="flex flex-wrap gap-1.5">
+
+              <div className="flex flex-wrap gap-1.5 mb-6">
                 {['Methodology', 'Age Dev', 'FORGE', 'Games', 'Staff Protocol'].map(tag => (
                   <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(0,175,81,0.08)', border: '1px solid rgba(0,175,81,0.2)', color: '#4ade80' }}>
+                    style={{ background: 'rgba(0,175,81,0.06)', border: '1px solid rgba(0,175,81,0.15)', color: '#4ade80' }}>
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-          </Link>
+
+            <div className="px-6 pb-5 flex flex-col gap-2">
+              <Link href="/l2/exam">
+                <button className="w-full py-2.5 rounded-xl text-sm font-bold bg-white text-[#0a0a0a] hover:bg-[#f0ede8] transition-colors">
+                  Take Exam →
+                </button>
+              </Link>
+              <Link href="/l2" className="text-center text-xs text-[#444] hover:text-[#888] transition-colors py-1">
+                Study materials
+              </Link>
+            </div>
+          </div>
 
           {/* L3 */}
-          <Link href="/l3">
-            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
-              style={{
-                background: 'rgba(244,238,25,0.03)',
-                border: '1px solid rgba(244,238,25,0.15)',
-              }}>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 3</span>
+          <div className="rounded-2xl overflow-hidden"
+            style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#555]">Level 3</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-                  style={{ background: 'rgba(244,238,25,0.1)', color: '#f4ee19', border: '1px solid rgba(244,238,25,0.25)' }}>
+                  style={{ background: 'rgba(244,238,25,0.08)', color: '#bfb830', border: '1px solid rgba(244,238,25,0.2)' }}>
                   Beta
                 </span>
               </div>
-              <div className="text-4xl font-black mb-2" style={{
-                fontFamily: 'var(--font-raleway)',
-                background: 'linear-gradient(135deg, #f4ee19, #ffe066)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
+
+              <div className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'var(--font-raleway)', letterSpacing: '-0.02em' }}>
                 TGT
               </div>
-              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+              <h3 className="text-base font-bold text-[#e8e5e0] mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
                 Textbook Certification
               </h3>
-              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
+              <p className="text-[13px] text-[#555] leading-relaxed mb-5" style={{ fontFamily: 'var(--font-work-sans)' }}>
                 17-chapter Golf Textbook quiz engine. 90% pass standard per chapter. For career teachers and PGA professionals.
               </p>
-              <div className="flex flex-wrap gap-1.5">
+
+              <div className="flex flex-wrap gap-1.5 mb-6">
                 {['17 Chapters', '90% Pass', 'PGA Pros', 'Cohort'].map(tag => (
                   <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(244,238,25,0.06)', border: '1px solid rgba(244,238,25,0.2)', color: '#f4ee19' }}>
+                    style={{ background: 'rgba(244,238,25,0.05)', border: '1px solid rgba(244,238,25,0.15)', color: '#9a9530' }}>
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-          </Link>
+
+            <div className="px-6 pb-5 flex flex-col gap-2">
+              <Link href="/l3">
+                <button className="w-full py-2.5 rounded-xl text-sm font-bold bg-white text-[#0a0a0a] hover:bg-[#f0ede8] transition-colors">
+                  Enter →
+                </button>
+              </Link>
+              <Link href="/l3/chapters" className="text-center text-xs text-[#444] hover:text-[#888] transition-colors py-1">
+                Chapter list
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* FORGE banner */}
+        {/* ── FORGE BANNER ──────────────────────────────────────── */}
         <Link href="/forge">
-          <div className="rounded-2xl p-6 sm:p-8 transition-all duration-300 hover:scale-[1.01]"
-            style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}>
+          <div className="rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:bg-[#161616] cursor-pointer"
+            style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)' }}>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Cross-Level Module</span>
+                <div className="flex items-center gap-3 mb-1.5">
+                  <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#555]">Cross-Level Module</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(0,175,81,0.1)', color: '#00af51', border: '1px solid rgba(0,175,81,0.2)' }}>
+                    style={{ background: 'rgba(0,175,81,0.08)', color: '#00af51', border: '1px solid rgba(0,175,81,0.18)' }}>
                     L2 + L3
                   </span>
                 </div>
-                <h3 className="text-2xl font-black text-white mb-1" style={{ fontFamily: 'var(--font-raleway)' }}>
+                <h3 className="text-xl font-black text-[#e8e5e0] mb-1" style={{ fontFamily: 'var(--font-raleway)' }}>
                   FORGE Drill System
                 </h3>
-                <p className="text-sm text-[#6b7280]">
-                  Fidelity · Overload · Randomization · Graded · Exit criteria — All 4 drills with full scoring tables and RYP Performance Index
+                <p className="text-[13px] text-[#555]" style={{ fontFamily: 'var(--font-work-sans)' }}>
+                  Fidelity · Overload · Randomization · Graded · Exit criteria — All 4 drills with full scoring tables
                 </p>
               </div>
-              <div className="flex gap-6 sm:gap-8 flex-shrink-0">
+              <div className="flex gap-5 sm:gap-6 flex-shrink-0">
                 {['Driving', 'Approach', 'Chipping', 'Putting'].map((d, i) => (
                   <div key={d} className="text-center">
-                    <div className="text-2xl font-black" style={{
-                      fontFamily: 'var(--font-raleway)',
-                      background: 'linear-gradient(135deg, #00af51, #00d466)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}>{i + 1}</div>
-                    <div className="text-[10px] text-[#6b7280]">{d}</div>
+                    <div className="text-xl font-black text-white" style={{ fontFamily: 'var(--font-raleway)' }}>{i + 1}</div>
+                    <div className="text-[10px] text-[#444] mt-0.5">{d}</div>
                   </div>
                 ))}
               </div>
@@ -217,12 +222,19 @@ export default function Home() {
           </div>
         </Link>
 
-        {/* Footer */}
-        <div className="text-center mt-16 text-[#4b5563] text-xs">
-          <p>Interlachen Country Club · Est. 1909</p>
-          <p className="mt-1">Dr. Luke Benoit, PhD, PGA · Director of Instruction</p>
-          <p className="mt-0.5">cert.rypgolf.com</p>
+        {/* ── FOOTER ────────────────────────────────────────────── */}
+        <div className="text-center mt-14 space-y-1">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="h-px flex-1 max-w-[80px] bg-[rgba(255,255,255,0.06)]" />
+            <span className="text-[10px] tracking-[0.2em] uppercase text-[#333]">Interlachen Country Club</span>
+            <div className="h-px flex-1 max-w-[80px] bg-[rgba(255,255,255,0.06)]" />
+          </div>
+          <p className="text-[#333] text-[11px]" style={{ fontFamily: 'var(--font-work-sans)' }}>
+            Dr. Luke Benoit, PhD, PGA · Director of Instruction
+          </p>
+          <p className="text-[#2a2a2a] text-[11px]">cert.rypgolf.com</p>
         </div>
+
       </div>
     </div>
   );

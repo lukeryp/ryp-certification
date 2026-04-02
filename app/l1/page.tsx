@@ -61,28 +61,35 @@ export default function L1Page() {
         </Link>
 
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
-            style={{ background: 'rgba(0,175,81,0.1)', border: '1px solid rgba(0,175,81,0.25)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00af51]" />
-            <span className="text-[#00af51] text-xs font-semibold tracking-widest uppercase">Level 1 Certification</span>
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#666]" />
+            <span className="text-[#666] text-[10px] font-semibold tracking-widest uppercase">Level 1 Certification</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black text-white mb-4 leading-tight"
+          <h1 className="text-4xl sm:text-5xl font-black text-[#f0ede8] mb-3 leading-tight"
             style={{ fontFamily: 'var(--font-raleway)' }}>
-            Junior Golf{' '}
-            <span style={{
-              background: 'linear-gradient(135deg, #00af51, #00d466)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>Helper</span>
+            Junior Golf Helper
           </h1>
 
-          <p className="text-base sm:text-lg text-[#9ca3af] leading-relaxed max-w-2xl"
+          <p className="text-base text-[#555] leading-relaxed max-w-2xl mb-6"
             style={{ fontFamily: 'var(--font-work-sans)' }}>
             For Meadowbrook Tuesday helpers, parent volunteers, and program assistants
           </p>
+
+          {/* Prominent exam CTA */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/l1/exam">
+              <button className="px-7 py-3 rounded-xl font-bold text-[#0a0a0a] bg-white hover:bg-[#f0ede8] transition-colors text-sm">
+                Take the Exam →
+              </button>
+            </Link>
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-[#555]"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span>24 questions · 2 essays · 45 min · 80% to pass</span>
+            </div>
+          </div>
         </div>
 
         {/* Description card */}
