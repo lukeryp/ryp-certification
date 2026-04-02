@@ -29,7 +29,8 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-lg font-black text-[#00af51]" style={{ fontFamily: 'var(--font-raleway)' }}>RYP</span>
+            <span className="text-sm font-black text-[#00af51] tracking-widest" style={{ fontFamily: 'var(--font-raleway)' }}>ICC</span>
+            <span className="text-[#4b5563] text-xs font-medium hidden sm:block">Interlachen</span>
           </Link>
           {config && (
             <>

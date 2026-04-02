@@ -15,8 +15,8 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "RYP Golf — Certification",
-  description: "RYP Golf Instructor & Staff Certification Platform",
+  title: "Interlachen Country Club — Staff Certification",
+  description: "Interlachen Country Club Junior Golf Staff Certification Platform",
 };
 
 export default function RootLayout({

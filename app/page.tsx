@@ -26,22 +26,29 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
             style={{ background: 'rgba(0,175,81,0.1)', border: '1px solid rgba(0,175,81,0.25)' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#00af51]" style={{ animation: 'pulse 2s infinite' }} />
-            <span className="text-[#00af51] text-xs font-medium tracking-widest uppercase">Interlachen Country Club</span>
+            <span className="text-[#00af51] text-xs font-medium tracking-widest uppercase">Junior Golf · Staff Certification Platform</span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl font-black mb-4 tracking-tight leading-none"
+          {/* ICC Diamond Monogram */}
+          <div className="flex justify-center mb-6">
+            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="36,2 70,36 36,70 2,36" fill="none" stroke="#00af51" strokeWidth="2" opacity="0.4"/>
+              <text x="36" y="46" textAnchor="middle" fontSize="28" fontWeight="900" fill="#00af51" fontFamily="Georgia, serif" opacity="0.9">ICC</text>
+              <text x="36" y="76" textAnchor="middle" fontSize="10" fontWeight="600" fill="#6b7280" fontFamily="Georgia, serif" letterSpacing="3">1909</text>
+            </svg>
+          </div>
+          <h1 className="text-5xl sm:text-7xl font-black mb-3 tracking-tight leading-none"
             style={{ fontFamily: 'var(--font-raleway)' }}>
-            <span className="text-white">RYP</span>
             <span style={{
               background: 'linear-gradient(135deg, #00af51, #00d466)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-            }}> Golf</span>
+            }}>Interlachen</span>
           </h1>
           <h2 className="text-xl sm:text-2xl font-light text-[#9ca3af] tracking-wide"
             style={{ fontFamily: 'var(--font-raleway)' }}>
-            Certification Platform
+            Junior Golf Staff Certification
           </h2>
         </div>
 
@@ -212,8 +219,9 @@ export default function Home() {
 
         {/* Footer */}
         <div className="text-center mt-16 text-[#4b5563] text-xs">
-          <p>cert.rypgolf.com — RYP Golf Research Institute</p>
-          <p className="mt-1">Dr. Luke Benoit, PhD, PGA · Director of Instruction, Interlachen Country Club</p>
+          <p>Interlachen Country Club · Est. 1909</p>
+          <p className="mt-1">Dr. Luke Benoit, PhD, PGA · Director of Instruction</p>
+          <p className="mt-0.5">cert.rypgolf.com</p>
         </div>
       </div>
     </div>

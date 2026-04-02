@@ -159,9 +159,29 @@ export default function L1Page() {
           ))}
         </div>
 
+        {/* Take Assessment CTA */}
+        <div className="mt-10 rounded-2xl p-6" style={{ background: 'rgba(0,175,81,0.05)', border: '1px solid rgba(0,175,81,0.2)' }}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-white mb-1" style={{ fontFamily: 'var(--font-raleway)' }}>
+                Ready to get certified?
+              </h3>
+              <p className="text-sm text-[#9ca3af]">
+                24 multiple choice questions + 2 essays · 45 minutes · Pass score: 80 / 100
+              </p>
+            </div>
+            <Link href="/l1/exam">
+              <button className="flex-shrink-0 px-6 py-3 rounded-xl font-bold text-[#0d0d0d] transition-all hover:opacity-90 active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, #00af51, #00d466)' }}>
+                Take Assessment →
+              </button>
+            </Link>
+          </div>
+        </div>
+
         {/* Footer */}
-        <div className="text-center mt-16 text-[#4b5563] text-xs" style={{ fontFamily: 'var(--font-work-sans)' }}>
-          <p>RYP Golf · L1 Junior Golf Helper Certification</p>
+        <div className="text-center mt-12 text-[#4b5563] text-xs" style={{ fontFamily: 'var(--font-work-sans)' }}>
+          <p>Interlachen Country Club · L1 Junior Golf Helper Certification</p>
         </div>
       </div>
     </div>
