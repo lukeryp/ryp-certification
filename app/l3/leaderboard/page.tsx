@@ -3,12 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function ChaptersPage() {
+export default function L3Leaderboard() {
   const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/l3/chapters');
-  }, [router]);
-
+  useEffect(() => { router.replace('/leaderboard'); }, [router]);
   return null;
 }

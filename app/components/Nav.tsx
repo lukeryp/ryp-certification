@@ -5,50 +5,75 @@ import { usePathname } from 'next/navigation';
 import { getCurrentUser, logout } from '../lib/storage';
 import { useRouter } from 'next/navigation';
 
-export default function Nav() {
+export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
   const pathname = usePathname();
   const router = useRouter();
   const user = getCurrentUser();
 
-  if (!user) return null;
+  const levelConfig = {
+    l1: { label: 'Junior Golf Helper', color: '#00af51', abbr: 'L1' },
+    l2: { label: 'ICC Instructor', color: '#00af51', abbr: 'L2' },
+    l3: { label: 'Textbook Cert', color: '#f4ee19', abbr: 'L3' },
+  };
 
-  const links = [
-    { href: '/', label: 'Dashboard', icon: '◉' },
-    { href: '/chapters', label: 'Chapters', icon: '◈' },
-    { href: '/leaderboard', label: 'Cohort', icon: '◎' },
-  ];
+  const config = level ? levelConfig[level] : null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#141414] border-t border-[#2a2a2a] z-50 md:relative md:border-t-0 md:border-b">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex items-center justify-between">
-          <div className="hidden md:flex items-center gap-2 py-4">
-            <span className="text-[#c9b99a] font-bold text-lg font-serif">RYP</span>
-            <span className="text-[#6b6b6b] text-sm">Level 1 Certification</span>
-          </div>
-          <div className="flex items-center gap-1 w-full md:w-auto justify-around md:justify-end">
-            {links.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex flex-col items-center py-3 px-4 text-xs transition-colors ${
-                  pathname === link.href
-                    ? 'text-[#c9b99a]'
-                    : 'text-[#6b6b6b] hover:text-[#e8e4de]'
-                }`}
-              >
-                <span className="text-lg mb-0.5">{link.icon}</span>
-                {link.label}
+    <nav className="sticky top-0 z-50"
+      style={{
+        background: 'rgba(13,13,13,0.85)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}>
+      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-lg font-black text-[#00af51]" style={{ fontFamily: 'var(--font-raleway)' }}>RYP</span>
+          </Link>
+          {config && (
+            <>
+              <span className="text-[#3a3a3a]">/</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                style={{
+                  background: `rgba(${config.color === '#00af51' ? '0,175,81' : '244,238,25'},0.1)`,
+                  color: config.color,
+                  border: `1px solid rgba(${config.color === '#00af51' ? '0,175,81' : '244,238,25'},0.25)`,
+                }}>
+                {config.abbr}
+              </span>
+              <span className="text-sm text-[#6b7280] hidden sm:block">{config.label}</span>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1">
+          {level === 'l2' && (
+            <Link href="/forge" className="text-xs px-3 py-1.5 rounded-lg transition-colors text-[#6b7280] hover:text-white">
+              FORGE
+            </Link>
+          )}
+          {level === 'l3' && user && (
+            <>
+              <Link href="/l3/chapters" className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/chapters') ? 'text-[#f4ee19]' : 'text-[#6b7280] hover:text-white'}`}>
+                Chapters
               </Link>
-            ))}
-            <button
-              onClick={() => { logout(); router.push('/login'); }}
-              className="flex flex-col items-center py-3 px-4 text-xs text-[#6b6b6b] hover:text-[#e8e4de] transition-colors"
-            >
-              <span className="text-lg mb-0.5">◇</span>
-              Sign Out
-            </button>
-          </div>
+              <Link href="/leaderboard" className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/leaderboard') ? 'text-[#f4ee19]' : 'text-[#6b7280] hover:text-white'}`}>
+                Cohort
+              </Link>
+              <button
+                onClick={() => { logout(); router.push('/login'); }}
+                className="text-xs px-3 py-1.5 rounded-lg text-[#6b7280] hover:text-white transition-colors ml-1"
+              >
+                Sign Out
+              </button>
+            </>
+          )}
+          {!level && (
+            <Link href="/l3" className="text-xs px-3 py-1.5 rounded-lg text-[#6b7280] hover:text-white transition-colors">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>

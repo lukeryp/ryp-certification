@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Raleway, Work_Sans } from "next/font/google";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const raleway = Raleway({
   subsets: ["latin"],
-  variable: "--font-cormorant",
+  variable: "--font-raleway",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  variable: "--font-work-sans",
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-});
-
 export const metadata: Metadata = {
-  title: "RYP Golf — Level 1 Certification",
-  description: "The Golf Textbook Instructor Certification Dashboard",
+  title: "RYP Golf — Certification",
+  description: "RYP Golf Instructor & Staff Certification Platform",
 };
 
 export default function RootLayout({
@@ -25,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${cormorant.variable} ${outfit.variable} font-sans antialiased bg-[#0a0a0a] text-[#e8e4de] min-h-screen`}>
+      <body className={`${raleway.variable} ${workSans.variable} antialiased bg-[#0d0d0d] text-[#f0f0f0] min-h-screen`}>
         {children}
       </body>
     </html>

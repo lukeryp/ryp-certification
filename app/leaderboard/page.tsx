@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Nav from '../components/Nav';
 import { getCurrentUser, getAllProgress, getCompletionPercentage } from '../lib/storage';
 import { CHAPTERS } from '../lib/chapters';
@@ -14,85 +15,85 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const u = getCurrentUser();
-    if (!u) { router.push('/login'); return; }
+    if (!u) { router.push('/login?redirect=/l3'); return; }
     setUser(u);
     setAllProgress(getAllProgress());
   }, [router]);
 
   if (!user) return null;
 
-  const sorted = [...allProgress].sort((a, b) => {
-    const aComp = getCompletionPercentage(a.progress);
-    const bComp = getCompletionPercentage(b.progress);
-    return bComp - aComp;
-  });
+  const sorted = [...allProgress].sort((a, b) =>
+    getCompletionPercentage(b.progress) - getCompletionPercentage(a.progress)
+  );
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
-      <Nav />
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-[#e8e4de] mb-2">Interlachen Cohort</h1>
-        <p className="text-[#6b6b6b] text-sm mb-6">Everyone sees everyone. Progress together.</p>
+    <div className="min-h-screen bg-[#0d0d0d]">
+      <Nav level="l3" />
+      <main className="max-w-4xl mx-auto px-4 py-6 pb-12">
+        <div className="mb-6">
+          <Link href="/l3" className="text-xs text-[#6b7280] hover:text-white transition-colors">← Dashboard</Link>
+          <h1 className="text-2xl font-black text-white mt-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+            Interlachen Cohort
+          </h1>
+          <p className="text-[#6b7280] text-sm mt-1">Everyone sees everyone. Progress together.</p>
+        </div>
 
         {sorted.length === 0 ? (
-          <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
-            <p className="text-[#6b6b6b]">No cohort members yet. Progress will appear as people log in and take quizzes.</p>
+          <div className="rounded-2xl p-8 text-center"
+            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[#6b7280]">No cohort members yet. Progress will appear as people log in and take quizzes.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {sorted.map((entry, rank) => {
               const comp = getCompletionPercentage(entry.progress);
               const passedCount = Object.values(entry.progress.chapterResults).filter(r => r.passed).length;
               const isMe = entry.user.id === user.id;
 
               return (
-                <div key={entry.user.id} className={`rounded-xl border p-5 ${
-                  isMe ? 'bg-[#c9b99a]/8 border-[#c9b99a]/30' : 'bg-[#141414] border-[#2a2a2a]'
-                }`}>
+                <div key={entry.user.id} className="rounded-2xl p-5 transition-all"
+                  style={{
+                    background: isMe ? 'rgba(244,238,25,0.05)' : 'rgba(255,255,255,0.02)',
+                    border: isMe ? '1px solid rgba(244,238,25,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                  }}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                        rank === 0 ? 'bg-yellow-600 text-yellow-100' :
-                        rank === 1 ? 'bg-gray-500 text-gray-100' :
-                        rank === 2 ? 'bg-amber-700 text-amber-100' :
-                        'bg-[#2a2a2a] text-[#6b6b6b]'
-                      }`}>
+                      <span className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black"
+                        style={{
+                          background: rank === 0 ? 'rgba(244,238,25,0.15)' : rank === 1 ? 'rgba(156,163,175,0.15)' : rank === 2 ? 'rgba(180,120,60,0.15)' : 'rgba(255,255,255,0.05)',
+                          color: rank === 0 ? '#f4ee19' : rank === 1 ? '#9ca3af' : rank === 2 ? '#b4783c' : '#6b7280',
+                          border: rank < 3 ? '1px solid currentColor' : '1px solid rgba(255,255,255,0.08)',
+                          fontFamily: 'var(--font-raleway)',
+                        }}>
                         {rank + 1}
                       </span>
                       <div>
-                        <p className="font-medium text-[#e8e4de]">
+                        <p className="font-semibold text-white text-sm" style={{ fontFamily: 'var(--font-raleway)' }}>
                           {entry.user.name}
-                          {isMe && <span className="text-[#c9b99a] text-xs ml-2">(you)</span>}
+                          {isMe && <span className="text-xs ml-2" style={{ color: '#f4ee19' }}>(you)</span>}
                         </p>
-                        <p className="text-xs text-[#6b6b6b]">{entry.user.email}</p>
+                        <p className="text-xs text-[#6b7280]">{entry.user.email}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-[#e8e4de]">{comp}%</p>
-                      <p className="text-xs text-[#6b6b6b]">{passedCount}/17</p>
+                      <p className="text-lg font-black text-white" style={{ fontFamily: 'var(--font-raleway)' }}>{comp}%</p>
+                      <p className="text-xs text-[#6b7280]">{passedCount}/17 chapters</p>
                     </div>
                   </div>
 
                   {/* Chapter progress dots */}
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5">
                     {CHAPTERS.map(ch => {
                       const result = entry.progress.chapterResults[ch.number];
                       return (
-                        <div
-                          key={ch.number}
+                        <div key={ch.number}
                           title={`Ch ${ch.number}: ${ch.title} — ${result?.passed ? 'Passed' : result?.attempts > 0 ? `Best: ${result.bestScore}/10` : 'Not started'}`}
-                          className={`flex-1 h-2 rounded-full ${
-                            result?.passed ? 'bg-[#c9b99a]' :
-                            result?.attempts > 0 ? 'bg-amber-500' :
-                            'bg-[#2a2a2a]'
-                          }`}
-                        />
+                          className="flex-1 h-1.5 rounded-full transition-all"
+                          style={{
+                            background: result?.passed ? '#f4ee19' : result?.attempts > 0 ? '#f59e0b' : 'rgba(255,255,255,0.08)',
+                          }} />
                       );
                     })}
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-[10px] text-[#6b6b6b]">Ch 0</span>
-                    <span className="text-[10px] text-[#6b6b6b]">Ch 16</span>
                   </div>
                 </div>
               );
