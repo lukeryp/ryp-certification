@@ -1,0 +1,169 @@
+'use client';
+
+import Link from 'next/link';
+import Nav from '../components/Nav';
+
+const modules = [
+  {
+    href: '/l1/safety',
+    number: '01',
+    title: 'Safety First',
+    description: 'Basic golf safety rules, equipment handling, and student supervision protocols.',
+    tags: ['Equipment', 'Range Safety', 'Supervision', 'Weather', 'First Aid'],
+  },
+  {
+    href: '/l1/communication',
+    number: '02',
+    title: 'Communication Basics',
+    description: 'Working with kids at every age level, supporting the head coach, and handling parent interaction.',
+    tags: ['Junior Golfers', 'Age Dev', 'Coach Comms', 'Parents'],
+  },
+  {
+    href: '/l1/setup',
+    number: '03',
+    title: 'Setup & Teardown',
+    description: 'Range setup, equipment care, station organization, and post-session teardown standards.',
+    tags: ['Pre-Session', 'Stations', 'Club Fitting', 'Teardown'],
+  },
+  {
+    href: '/l1/games',
+    number: '04',
+    title: 'Game Facilitation',
+    description: 'Running drills and games, keeping kids engaged, and the full RYP games library.',
+    tags: ['Putting Games', 'Chipping Games', 'Full Swing', 'Scoring'],
+  },
+];
+
+export default function L1Page() {
+  return (
+    <div className="min-h-screen bg-[#0d0d0d] relative overflow-hidden">
+      {/* Background grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,175,81,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,175,81,0.03) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      {/* Glow */}
+      <div className="absolute top-[-150px] left-[-150px] w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,175,81,0.07) 0%, transparent 70%)' }} />
+
+      <Nav level="l1" />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-10 sm:py-16">
+        {/* Back link */}
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#6b7280] hover:text-[#00af51] transition-colors mb-8">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to certifications
+        </Link>
+
+        {/* Header */}
+        <div className="mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
+            style={{ background: 'rgba(0,175,81,0.1)', border: '1px solid rgba(0,175,81,0.25)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00af51]" />
+            <span className="text-[#00af51] text-xs font-semibold tracking-widest uppercase">Level 1 Certification</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl font-black text-white mb-4 leading-tight"
+            style={{ fontFamily: 'var(--font-raleway)' }}>
+            Junior Golf{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #00af51, #00d466)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>Helper</span>
+          </h1>
+
+          <p className="text-base sm:text-lg text-[#9ca3af] leading-relaxed max-w-2xl"
+            style={{ fontFamily: 'var(--font-work-sans)' }}>
+            For Meadowbrook Tuesday helpers, parent volunteers, and program assistants
+          </p>
+        </div>
+
+        {/* Description card */}
+        <div className="rounded-2xl p-6 mb-10"
+          style={{
+            background: 'rgba(0,175,81,0.04)',
+            border: '1px solid rgba(0,175,81,0.15)',
+          }}>
+          <h2 className="text-lg font-bold text-white mb-3" style={{ fontFamily: 'var(--font-raleway)' }}>
+            What this certification covers
+          </h2>
+          <p className="text-[#9ca3af] leading-relaxed text-[15px]" style={{ fontFamily: 'var(--font-work-sans)' }}>
+            The Level 1 Junior Golf Helper certification is designed for anyone supporting RYP Golf programming who is not the primary instructor.
+            You'll learn how to keep kids safe on the range, communicate effectively with junior golfers at every age, set up and break down sessions professionally,
+            and facilitate games that keep energy and engagement high. This is the foundation of everything we do at Meadowbrook Tuesday sessions.
+          </p>
+          <div className="flex flex-wrap gap-4 mt-5">
+            {['4 Modules', 'Self-paced', 'No prerequisites', 'Volunteer & Staff'].map(badge => (
+              <span key={badge} className="text-xs text-[#00af51] font-medium"
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span className="w-1 h-1 rounded-full bg-[#00af51] inline-block" />
+                {badge}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Module cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {modules.map((mod) => (
+            <Link key={mod.href} href={mod.href}>
+              <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:border-[rgba(0,175,81,0.35)] cursor-pointer"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                <div className="flex items-start justify-between mb-4">
+                  <span className="text-3xl font-black leading-none"
+                    style={{
+                      fontFamily: 'var(--font-raleway)',
+                      background: 'linear-gradient(135deg, #00af51, #00d466)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}>
+                    {mod.number}
+                  </span>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-[#3a3a3a] mt-1">
+                    <path d="M4 9h10M9 4l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+
+                <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+                  {mod.title}
+                </h3>
+                <p className="text-[14px] text-[#6b7280] leading-relaxed mb-4" style={{ fontFamily: 'var(--font-work-sans)' }}>
+                  {mod.description}
+                </p>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {mod.tags.map(tag => (
+                    <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full"
+                      style={{
+                        background: 'rgba(0,175,81,0.07)',
+                        border: '1px solid rgba(0,175,81,0.18)',
+                        color: '#4ade80',
+                      }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-16 text-[#4b5563] text-xs" style={{ fontFamily: 'var(--font-work-sans)' }}>
+          <p>RYP Golf · L1 Junior Golf Helper Certification</p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,126 +1,221 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Nav from './components/Nav';
-import { getCurrentUser, getUserProgress, getCompletionPercentage } from './lib/storage';
-import { CHAPTERS } from './lib/chapters';
-import { UserProfile, UserProgress } from './lib/types';
 
-export default function Dashboard() {
-  const router = useRouter();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [progress, setProgress] = useState<UserProgress | null>(null);
-
-  useEffect(() => {
-    const u = getCurrentUser();
-    if (!u) {
-      router.push('/login');
-      return;
-    }
-    setUser(u);
-    setProgress(getUserProgress(u.id));
-  }, [router]);
-
-  if (!user || !progress) return null;
-
-  const completion = getCompletionPercentage(progress);
-  const passedCount = Object.values(progress.chapterResults).filter(r => r.passed).length;
-  const totalAttempts = Object.values(progress.chapterResults).reduce((sum, r) => sum + r.attempts, 0);
-  const nextChapter = CHAPTERS.find(ch => !progress.chapterResults[ch.number]?.passed);
-
+export default function Home() {
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
-      <Nav />
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#e8e4de]">Welcome, {user.name.split(' ')[0]}</h1>
-          <p className="text-[#6b6b6b] text-sm">Level 1 Certification Progress</p>
+    <div className="min-h-screen bg-[#0d0d0d] relative overflow-hidden">
+      {/* Background grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,175,81,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,175,81,0.04) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      {/* Glow orbs */}
+      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,175,81,0.08) 0%, transparent 70%)' }} />
+      <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(244,238,25,0.06) 0%, transparent 70%)' }} />
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:py-20">
+        {/* Header */}
+        <div className="text-center mb-16 animate-fade-up">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
+            style={{ background: 'rgba(0,175,81,0.1)', border: '1px solid rgba(0,175,81,0.25)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00af51]" style={{ animation: 'pulse 2s infinite' }} />
+            <span className="text-[#00af51] text-xs font-medium tracking-widest uppercase">Interlachen Country Club</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-7xl font-black mb-4 tracking-tight leading-none"
+            style={{ fontFamily: 'var(--font-raleway)' }}>
+            <span className="text-white">RYP</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #00af51, #00d466)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}> Golf</span>
+          </h1>
+          <h2 className="text-xl sm:text-2xl font-light text-[#9ca3af] tracking-wide"
+            style={{ fontFamily: 'var(--font-raleway)' }}>
+            Certification Platform
+          </h2>
         </div>
 
-        {/* Textbook PDF link */}
-        <div className="mb-6">
-          <a
-            href="https://rypgolf.com/textbook.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-[#c9b99a] hover:text-[#e8e4de] transition-colors"
-          >
-            <span>↓</span>
-            <span>Download The Golf Textbook (Latest Draft)</span>
-          </a>
-        </div>
+        {/* Level cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
 
-        {/* Progress ring */}
-        <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-6 mb-6">
-          <div className="flex items-center gap-6">
-            <div className="relative w-24 h-24 flex-shrink-0">
-              <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" strokeWidth="8" />
-                <circle
-                  cx="50" cy="50" r="42" fill="none"
-                  stroke="#c9b99a"
-                  strokeWidth="8"
-                  strokeDasharray={`${completion * 2.64} 264`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold">{completion}%</span>
+          {/* L1 */}
+          <Link href="/l1">
+            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.07)',
+              }}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 1</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(0,175,81,0.1)', color: '#00af51', border: '1px solid rgba(0,175,81,0.2)' }}>
+                  Open
+                </span>
+              </div>
+              <div className="text-4xl font-black mb-2" style={{
+                fontFamily: 'var(--font-raleway)',
+                background: 'linear-gradient(135deg, #00af51, #00d466)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                JGH
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+                Junior Golf Helper
+              </h3>
+              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
+                For Meadowbrook Tuesday helpers and volunteers. Safety, communication, setup, and game facilitation.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {['Safety', 'Communication', 'Setup', 'Games'].map(tag => (
+                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full text-[#9ca3af]"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-[#e8e4de]">{passedCount}/17</div>
-              <div className="text-[#6b6b6b] text-sm">Chapters Passed</div>
-              <div className="text-[#6b6b6b] text-xs mt-1">{totalAttempts} total quiz attempts</div>
-            </div>
-          </div>
-          {completion === 100 && (
-            <div className="mt-4 p-3 bg-[#c9b99a]/10 border border-[#c9b99a]/30 rounded-lg text-center">
-              <span className="text-[#c9b99a] font-medium">Level 1 Certified</span>
-            </div>
-          )}
-        </div>
+          </Link>
 
-        {nextChapter && (
-          <Link href={`/chapters/${nextChapter.number}`} className="block mb-6">
-            <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] p-5 hover:border-[#c9b99a]/40 transition-colors">
-              <p className="text-xs text-[#c9b99a] font-medium mb-1">CONTINUE</p>
-              <p className="text-lg font-medium text-[#e8e4de]">
-                Chapter {nextChapter.number}: {nextChapter.title}
+          {/* L2 */}
+          <Link href="/l2">
+            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'rgba(0,175,81,0.04)',
+                border: '1px solid rgba(0,175,81,0.2)',
+              }}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 2</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: 'rgba(0,175,81,0.15)', color: '#00af51', border: '1px solid rgba(0,175,81,0.35)' }}>
+                  Featured
+                </span>
+              </div>
+              <div className="text-4xl font-black mb-2" style={{
+                fontFamily: 'var(--font-raleway)',
+                background: 'linear-gradient(135deg, #00af51, #00d466)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                ICC
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+                Instructor Certification
+              </h3>
+              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
+                Complete junior golf instruction methodology for Interlachen instructors. 13+ modules including FORGE drills and games library.
               </p>
-              <p className="text-sm text-[#6b6b6b] mt-1">{nextChapter.summary}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {['Methodology', 'Age Dev', 'FORGE', 'Games', 'Staff Protocol'].map(tag => (
+                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(0,175,81,0.08)', border: '1px solid rgba(0,175,81,0.2)', color: '#4ade80' }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </Link>
-        )}
 
-        <h2 className="text-sm font-medium text-[#6b6b6b] uppercase tracking-wider mb-3">All Chapters</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {CHAPTERS.map(ch => {
-            const result = progress.chapterResults[ch.number];
-            const status = result?.passed ? 'passed' : result?.attempts > 0 ? 'attempted' : 'not_started';
-            return (
-              <Link key={ch.number} href={`/chapters/${ch.number}`}>
-                <div className={`p-4 rounded-lg border transition-colors ${
-                  status === 'passed'
-                    ? 'bg-[#c9b99a]/10 border-[#c9b99a]/30'
-                    : status === 'attempted'
-                    ? 'bg-amber-900/10 border-amber-800/30'
-                    : 'bg-[#141414] border-[#2a2a2a] hover:border-[#3a3a3a]'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-[#6b6b6b]">Ch. {ch.number}</span>
-                    {status === 'passed' && <span className="text-[#c9b99a] text-sm">&#10003;</span>}
-                    {status === 'attempted' && result && <span className="text-amber-500 text-xs">{result.bestScore}/10</span>}
-                  </div>
-                  <p className="font-medium text-[#e8e4de] text-sm">{ch.title}</p>
-                </div>
-              </Link>
-            );
-          })}
+          {/* L3 */}
+          <Link href="/l3">
+            <div className="h-full rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'rgba(244,238,25,0.03)',
+                border: '1px solid rgba(244,238,25,0.15)',
+              }}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Level 3</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: 'rgba(244,238,25,0.1)', color: '#f4ee19', border: '1px solid rgba(244,238,25,0.25)' }}>
+                  Beta
+                </span>
+              </div>
+              <div className="text-4xl font-black mb-2" style={{
+                fontFamily: 'var(--font-raleway)',
+                background: 'linear-gradient(135deg, #f4ee19, #ffe066)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                TGT
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-raleway)' }}>
+                Textbook Certification
+              </h3>
+              <p className="text-sm text-[#6b7280] leading-relaxed mb-4">
+                17-chapter Golf Textbook quiz engine. 90% pass standard per chapter. For career teachers and PGA professionals.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {['17 Chapters', '90% Pass', 'PGA Pros', 'Cohort'].map(tag => (
+                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(244,238,25,0.06)', border: '1px solid rgba(244,238,25,0.2)', color: '#f4ee19' }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Link>
         </div>
-      </main>
+
+        {/* FORGE banner */}
+        <Link href="/forge">
+          <div className="rounded-2xl p-6 sm:p-8 transition-all duration-300 hover:scale-[1.01]"
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.07)',
+            }}>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-xs font-bold tracking-widest text-[#6b7280] uppercase">Cross-Level Module</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(0,175,81,0.1)', color: '#00af51', border: '1px solid rgba(0,175,81,0.2)' }}>
+                    L2 + L3
+                  </span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-1" style={{ fontFamily: 'var(--font-raleway)' }}>
+                  FORGE Drill System
+                </h3>
+                <p className="text-sm text-[#6b7280]">
+                  Fidelity · Overload · Randomization · Graded · Exit criteria — All 4 drills with full scoring tables and RYP Performance Index
+                </p>
+              </div>
+              <div className="flex gap-6 sm:gap-8 flex-shrink-0">
+                {['Driving', 'Approach', 'Chipping', 'Putting'].map((d, i) => (
+                  <div key={d} className="text-center">
+                    <div className="text-2xl font-black" style={{
+                      fontFamily: 'var(--font-raleway)',
+                      background: 'linear-gradient(135deg, #00af51, #00d466)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}>{i + 1}</div>
+                    <div className="text-[10px] text-[#6b7280]">{d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Footer */}
+        <div className="text-center mt-16 text-[#4b5563] text-xs">
+          <p>cert.rypgolf.com — RYP Golf Research Institute</p>
+          <p className="mt-1">Dr. Luke Benoit, PhD, PGA · Director of Instruction, Interlachen Country Club</p>
+        </div>
+      </div>
     </div>
   );
 }
