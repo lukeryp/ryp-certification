@@ -22,8 +22,8 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
   return (
     <nav className="sticky top-0 z-50"
       style={{
-        background: 'rgba(10,10,10,0.9)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(255,255,255,0.95)',
+        borderBottom: '1px solid rgba(20,31,15,0.12)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
       }}>
@@ -35,25 +35,25 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
               alt="ICC"
               width={26}
               height={26}
-              style={{ objectFit: 'contain', opacity: 0.85 }}
+              style={{ objectFit: 'contain', opacity: 0.9 }}
             />
-            <span className="text-xs font-semibold text-[#888] tracking-widest hidden sm:block"
+            <span className="text-xs font-semibold text-[#141f0f] tracking-widest hidden sm:block"
               style={{ fontFamily: 'var(--font-raleway)' }}>
               INTERLACHEN
             </span>
           </Link>
           {config && (
             <>
-              <span className="text-[#2a2a2a]">/</span>
+              <span className="text-[#ccc]">/</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest"
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  color: '#888',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(20,31,15,0.06)',
+                  color: '#141f0f',
+                  border: '1px solid rgba(20,31,15,0.15)',
                 }}>
                 {config.abbr}
               </span>
-              <span className="text-xs text-[#444] hidden sm:block" style={{ fontFamily: 'var(--font-work-sans)' }}>
+              <span className="text-xs text-[#888] hidden sm:block" style={{ fontFamily: 'var(--font-work-sans)' }}>
                 {config.label}
               </span>
             </>
@@ -62,7 +62,7 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
 
         <div className="flex items-center gap-1">
           {level === 'l2' && (
-            <Link href="/forge" className="text-[11px] px-3 py-1.5 rounded-lg transition-colors text-[#555] hover:text-[#999]"
+            <Link href="/forge" className="text-[11px] px-3 py-1.5 rounded-lg transition-colors text-[#888] hover:text-[#141f0f]"
               style={{ fontFamily: 'var(--font-work-sans)', letterSpacing: '0.05em' }}>
               FORGE
             </Link>
@@ -70,23 +70,23 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
           {level === 'l3' && user && (
             <>
               <Link href="/l3/chapters"
-                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/chapters') ? 'text-[#ccc]' : 'text-[#555] hover:text-[#999]'}`}>
+                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/chapters') ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
                 Chapters
               </Link>
               <Link href="/leaderboard"
-                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/leaderboard') ? 'text-[#ccc]' : 'text-[#555] hover:text-[#999]'}`}>
+                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/leaderboard') ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
                 Cohort
               </Link>
               <button
                 onClick={() => { logout(); router.push('/login'); }}
-                className="text-[11px] px-3 py-1.5 rounded-lg text-[#555] hover:text-[#999] transition-colors ml-1">
+                className="text-[11px] px-3 py-1.5 rounded-lg text-[#888] hover:text-[#141f0f] transition-colors ml-1">
                 Sign Out
               </button>
             </>
           )}
           {!level && (
             <Link href="/l3"
-              className="text-[11px] px-3 py-1.5 rounded-lg text-[#555] hover:text-[#999] transition-colors">
+              className="text-[11px] px-3 py-1.5 rounded-lg text-[#888] hover:text-[#141f0f] transition-colors">
               Sign In
             </Link>
           )}

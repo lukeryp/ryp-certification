@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Raleway, Work_Sans } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 
-const raleway = Raleway({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-raleway",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
-const workSans = Work_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-work-sans",
   weight: ["300", "400", "500", "600", "700"],
@@ -25,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${raleway.variable} ${workSans.variable} antialiased bg-[#0d0d0d] text-[#f0f0f0] min-h-screen`}>
+    <html lang="en">
+      <body className={`${cormorant.variable} ${inter.variable} antialiased bg-white text-[#2a2a2a] min-h-screen`}>
         {children}
       </body>
     </html>

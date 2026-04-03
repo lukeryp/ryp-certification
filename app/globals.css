@@ -3,74 +3,74 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #f0ede8;
-  --card: rgba(255, 255, 255, 0.03);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --green: #00af51;
-  --green-dim: rgba(0, 175, 81, 0.12);
-  --green-border: rgba(0, 175, 81, 0.25);
-  --yellow: #f4ee19;
-  --yellow-dim: rgba(244, 238, 25, 0.08);
-  --yellow-border: rgba(244, 238, 25, 0.25);
-  --muted: #666;
-  --muted-light: #999;
-  --cream: #c8bfb0;
-  --white: #f0ede8;
+  --background: #ffffff;
+  --foreground: #2a2a2a;
+  --card: rgba(20, 31, 15, 0.03);
+  --card-border: rgba(20, 31, 15, 0.1);
+  --green: #141f0f;
+  --green-dim: rgba(20, 31, 15, 0.06);
+  --green-border: rgba(20, 31, 15, 0.18);
+  --yellow: #9e812f;
+  --yellow-dim: rgba(158, 129, 47, 0.08);
+  --yellow-border: rgba(158, 129, 47, 0.2);
+  --muted: #888;
+  --muted-light: #aaa;
+  --cream: #f0ece4;
+  --white: #ffffff;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-work-sans), system-ui, sans-serif;
+  font-family: var(--font-work-sans), 'Helvetica Neue', sans-serif;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Scrollbar — thicker and easier to grab */
+/* Scrollbar — dark track, semi-white thumb */
 ::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-track { background: #141f0f; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.35);
   border-radius: 5px;
-  border: 2px solid #111;
+  border: 2px solid #141f0f;
 }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.55); }
 
 /* Glass morphism card */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(20, 31, 15, 0.03);
+  border: 1px solid rgba(20, 31, 15, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 .glass-green {
-  background: rgba(0, 175, 81, 0.06);
-  border: 1px solid rgba(0, 175, 81, 0.25);
+  background: rgba(20, 31, 15, 0.05);
+  border: 1px solid rgba(20, 31, 15, 0.18);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 .glass-yellow {
-  background: rgba(244, 238, 25, 0.06);
-  border: 1px solid rgba(244, 238, 25, 0.25);
+  background: rgba(158, 129, 47, 0.06);
+  border: 1px solid rgba(158, 129, 47, 0.2);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 /* Gradient text */
 .text-green-gradient {
-  background: linear-gradient(135deg, #00af51, #00d466);
+  background: linear-gradient(135deg, #141f0f, #2a3d20);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-yellow-gradient {
-  background: linear-gradient(135deg, #f4ee19, #ffe066);
+  background: linear-gradient(135deg, #9e812f, #c4a24a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
