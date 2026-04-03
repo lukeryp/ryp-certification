@@ -134,6 +134,9 @@ export default function InternationalPage() {
           </h1>
           <p className="text-[#9ca3af] text-base leading-relaxed" style={{ fontFamily: 'var(--font-work-sans)' }}>
             Three countries lead the world in junior golf development. Here&apos;s what we take from each.
+          <a href="/athletic_development_plan.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mt-3">
+              📄 ICC Athletic Development Plan (PDF)
+            </a>
           </p>
         </div>
 

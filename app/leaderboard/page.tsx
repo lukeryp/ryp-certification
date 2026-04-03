@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Nav from '../components/Nav';
 import { getCurrentUser, getAllProgress, getCompletionPercentage } from '../lib/storage';
+import { getAllProgressFromDB } from '../lib/db';
+import { supabaseConfigured } from '../lib/supabase';
 import { CHAPTERS } from '../lib/chapters';
 import { UserProfile, UserProgress } from '../lib/types';
 
@@ -12,12 +14,30 @@ export default function LeaderboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [allProgress, setAllProgress] = useState<{ user: UserProfile; progress: UserProgress }[]>([]);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+
+  async function loadProgress() {
+    if (supabaseConfigured) {
+      const data = await getAllProgressFromDB();
+      setAllProgress(data.length > 0 ? data : getAllProgress());
+    } else {
+      setAllProgress(getAllProgress());
+    }
+    setLastRefresh(new Date());
+  }
 
   useEffect(() => {
     const u = getCurrentUser();
     if (!u) { router.push('/login?redirect=/l3'); return; }
     setUser(u);
-    setAllProgress(getAllProgress());
+    loadProgress();
+
+    // Auto-refresh every 30s when Supabase is configured
+    if (supabaseConfigured) {
+      const interval = setInterval(loadProgress, 30_000);
+      return () => clearInterval(interval);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   if (!user) return null;
@@ -32,10 +52,26 @@ export default function LeaderboardPage() {
       <main className="max-w-4xl mx-auto px-4 py-6 pb-12">
         <div className="mb-6">
           <Link href="/l3" className="text-xs text-[#6b7280] hover:text-white transition-colors">← Dashboard</Link>
-          <h1 className="text-2xl font-black text-white mt-2" style={{ fontFamily: 'var(--font-raleway)' }}>
-            Interlachen Cohort
-          </h1>
-          <p className="text-[#6b7280] text-sm mt-1">Everyone sees everyone. Progress together.</p>
+          <div className="flex items-center justify-between mt-2">
+            <h1 className="text-2xl font-black text-white" style={{ fontFamily: 'var(--font-raleway)' }}>
+              Interlachen Cohort
+            </h1>
+            {supabaseConfigured && (
+              <button onClick={loadProgress}
+                className="text-xs px-3 py-1.5 rounded-lg transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                ↻ Refresh
+              </button>
+            )}
+          </div>
+          <p className="text-[#6b7280] text-sm mt-1">
+            Everyone sees everyone. Progress together.
+            {lastRefresh && supabaseConfigured && (
+              <span className="ml-2 text-[11px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                · updated {lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </p>
         </div>
 
         {sorted.length === 0 ? (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { setCurrentUser, getAllUsers } from '../lib/storage';
+import { getUserByEmail } from '../lib/db';
 import { Suspense } from 'react';
 
 function LoginForm() {
@@ -14,7 +15,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/l3';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -24,18 +25,23 @@ function LoginForm() {
     }
 
     const emailLower = email.toLowerCase().trim();
-    const users = getAllUsers();
-    const existing = users.find(u => u.email.toLowerCase() === emailLower);
 
-    const user = existing || {
-      id: crypto.randomUUID(),
-      email: emailLower,
-      name: name.trim(),
-      role: emailLower === 'luke.benoit@gmail.com' ? 'admin' as const : 'student' as const,
-    };
+    // Check localStorage first, then Supabase (for cross-device continuity)
+    const localUsers = getAllUsers();
+    const localExisting = localUsers.find(u => u.email.toLowerCase() === emailLower);
 
-    if (existing) {
-      (user as typeof user & { name: string }).name = name.trim();
+    let user = localExisting ?? await getUserByEmail(emailLower);
+
+    if (user) {
+      // Update name if changed
+      user = { ...user, name: name.trim() };
+    } else {
+      user = {
+        id: crypto.randomUUID(),
+        email: emailLower,
+        name: name.trim(),
+        role: emailLower === 'luke.benoit@gmail.com' ? 'admin' as const : 'student' as const,
+      };
     }
 
     setCurrentUser(user);

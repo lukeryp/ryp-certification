@@ -105,6 +105,9 @@ export default function StaffProtocolPage() {
           </h1>
           <p className="text-[#9ca3af] text-base leading-relaxed" style={{ fontFamily: 'var(--font-work-sans)' }}>
             Standards for the ICC Instruction Team — appearance, communication, incidents, and professional development.
+          <a href="/instructions_for_helpers.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mt-3">
+              📄 ICC Instructions for Helpers (PDF)
+            </a>
           </p>
         </div>
 

@@ -121,6 +121,9 @@ export default function LaunchMonitorPage() {
           </h1>
           <p className="text-[#9ca3af] text-base leading-relaxed" style={{ fontFamily: 'var(--font-work-sans)' }}>
             Parameter-based teaching using launch monitor data. Know when to use it — and when not to.
+          <a href="/athletic_development_plan.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mt-3">
+              📄 ICC Athletic Development Plan (PDF)
+            </a>
           </p>
         </div>
 

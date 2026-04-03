@@ -1,4 +1,5 @@
 import { QuizAttempt, UserProfile, UserProgress, ChapterResult, EssayAttempt } from './types';
+import { syncUser, syncQuizAttempt, syncEssayAttempt } from './db';
 
 const STORAGE_PREFIX = 'ryp_cert_';
 
@@ -20,6 +21,8 @@ export function setCurrentUser(user: UserProfile): void {
     users.push(user);
   }
   localStorage.setItem(STORAGE_PREFIX + 'users', JSON.stringify(users));
+  // Sync to Supabase (fire-and-forget)
+  syncUser(user);
 }
 
 export function getAllUsers(): UserProfile[] {
@@ -40,6 +43,8 @@ export function saveQuizAttempt(attempt: QuizAttempt): void {
     STORAGE_PREFIX + 'attempts_' + attempt.userId,
     JSON.stringify(attempts)
   );
+  // Sync to Supabase (fire-and-forget)
+  syncQuizAttempt(attempt);
 }
 
 export function getQuizAttempts(userId: string): QuizAttempt[] {
@@ -56,6 +61,8 @@ export function saveEssayAttempt(attempt: EssayAttempt): void {
     STORAGE_PREFIX + 'essay_' + attempt.userId,
     JSON.stringify(attempts)
   );
+  // Sync to Supabase (fire-and-forget)
+  syncEssayAttempt(attempt);
 }
 
 export function getEssayAttempts(userId: string): EssayAttempt[] {

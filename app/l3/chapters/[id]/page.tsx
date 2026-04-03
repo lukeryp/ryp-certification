@@ -103,7 +103,7 @@ export default function ChapterPage() {
               mode === 'study' ? 'bg-[#00af51] text-[#0a0a0a]' : 'bg-[rgba(255,255,255,0.03)] text-[#6b7280] hover:text-white'
             }`}
           >
-            Study Guide
+            Manual
           </button>
           <button
             onClick={() => { if (!submitted) { setMode('quiz'); } else { handleRetake(); }}}
@@ -122,18 +122,28 @@ export default function ChapterPage() {
           )}
         </div>
 
-        {/* Study mode */}
+        {/* Manual / Study mode */}
         {mode === 'study' && (
           <div className="space-y-4">
-            <p className="text-[#6b7280]">{chapter.summary}</p>
-            <h2 className="text-sm font-medium text-[#6b7280] uppercase tracking-wider mt-6">Key Concepts</h2>
-            <div className="space-y-3">
-              {chapter.keyConcepts.map((concept, i) => (
-                <div key={i} className="p-4 bg-[rgba(255,255,255,0.03)] rounded-lg border border-[rgba(255,255,255,0.08)]">
-                  <p className="text-sm text-white leading-relaxed">{concept}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-[#6b7280] text-sm italic">{chapter.summary}</p>
+            <a href="/golf_textbook.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mb-2">
+              📄 Golf Textbook (PDF)
+            </a>
+            {chapter.reading ? (
+              <div className="space-y-4">
+                {chapter.reading.split('\n\n').map((paragraph, i) => (
+                  <p key={i} className="text-sm text-white leading-relaxed">{paragraph}</p>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {chapter.keyConcepts.map((concept, i) => (
+                  <div key={i} className="p-4 bg-[rgba(255,255,255,0.03)] rounded-lg border border-[rgba(255,255,255,0.08)]">
+                    <p className="text-sm text-white leading-relaxed">{concept}</p>
+                  </div>
+                ))}
+              </div>
+            )}
             <button
               onClick={() => setMode('quiz')}
               className="w-full py-3 bg-[#00af51] hover:bg-[#009944] text-[#0a0a0a] font-medium rounded-lg transition-colors mt-6"

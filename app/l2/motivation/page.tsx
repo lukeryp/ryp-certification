@@ -125,6 +125,9 @@ export default function MotivationPage() {
           </h1>
           <p className="text-[#9ca3af] text-base leading-relaxed" style={{ fontFamily: 'var(--font-work-sans)' }}>
             Based on Achievement Goal Theory (Nicholls, 1984) and Self-Determination Theory (Deci & Ryan). Build the climate that keeps kids in the game.
+          <a href="/athletic_development_plan.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mt-3">
+              📄 ICC Athletic Development Plan (PDF)
+            </a>
           </p>
         </div>
 

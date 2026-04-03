@@ -11,6 +11,7 @@ export interface ChapterInfo {
   title: string;
   summary: string;
   keyConcepts: string[];
+  reading?: string;
 }
 
 export interface QuizAttempt {

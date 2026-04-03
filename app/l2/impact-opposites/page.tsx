@@ -145,6 +145,9 @@ export default function ImpactOppositesPage() {
           </h1>
           <p className="text-[#9ca3af] text-base leading-relaxed" style={{ fontFamily: 'var(--font-work-sans)' }}>
             The core diagnostic and correction tool in the RYP system. For every miss pattern, there is a prescribed opposite that recalibrates the movement.
+          <a href="/athletic_development_plan.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#00af51] hover:underline mt-3">
+              📄 ICC Athletic Development Plan (PDF)
+            </a>
           </p>
         </div>
 
