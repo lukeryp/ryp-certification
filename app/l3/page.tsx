@@ -44,6 +44,16 @@ export default function L3Dashboard() {
           <p className="text-[#6b7280] text-sm mt-1">Level 3 — Golf Textbook Certification</p>
         </div>
 
+        {/* Learning Environments Chart */}
+        <div className="mb-6">
+          <img
+            src="/learning_environments.png"
+            alt="Learning Environments: Assembly, Lab, Crucible, Arena"
+            className="w-full rounded-2xl"
+            style={{ maxWidth: 600, display: "block", margin: "0 auto" }}
+          />
+        </div>
+
         {/* Textbook PDF link */}
         <div className="mb-6">
           <a
