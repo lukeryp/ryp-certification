@@ -3,13 +3,31 @@ import { syncUser, syncQuizAttempt, syncEssayAttempt } from './db';
 
 const STORAGE_PREFIX = 'ryp_cert_';
 
-// User management
-export function getCurrentUser(): UserProfile | null {
-  if (typeof window === 'undefined') return null;
-  const data = localStorage.getItem(STORAGE_PREFIX + 'current_user');
-  return data ? JSON.parse(data) : null;
+/**
+ * Parse a localStorage value as JSON, returning `fallback` on any error.
+ * Prevents a malformed/partial write from crashing the whole session (M-1).
+ */
+function safeParse<T>(data: string | null, fallback: T): T {
+  if (data === null) return fallback;
+  try {
+    return JSON.parse(data) as T;
+  } catch {
+    return fallback;
+  }
 }
 
+// User management
+
+/** Returns the currently logged-in user profile, or null if not logged in. */
+export function getCurrentUser(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  return safeParse<UserProfile | null>(
+    localStorage.getItem(STORAGE_PREFIX + 'current_user'),
+    null
+  );
+}
+
+/** Persists the user profile to localStorage and syncs to Supabase. */
 export function setCurrentUser(user: UserProfile): void {
   localStorage.setItem(STORAGE_PREFIX + 'current_user', JSON.stringify(user));
   // Also add to users list
@@ -25,10 +43,13 @@ export function setCurrentUser(user: UserProfile): void {
   syncUser(user);
 }
 
+/** Returns all user profiles stored in localStorage. */
 export function getAllUsers(): UserProfile[] {
   if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_PREFIX + 'users');
-  return data ? JSON.parse(data) : [];
+  return safeParse<UserProfile[]>(
+    localStorage.getItem(STORAGE_PREFIX + 'users'),
+    []
+  );
 }
 
 export function logout(): void {
@@ -36,6 +57,8 @@ export function logout(): void {
 }
 
 // Quiz attempts
+
+/** Appends a quiz attempt to localStorage and syncs to Supabase. */
 export function saveQuizAttempt(attempt: QuizAttempt): void {
   const attempts = getQuizAttempts(attempt.userId);
   attempts.push(attempt);
@@ -47,13 +70,18 @@ export function saveQuizAttempt(attempt: QuizAttempt): void {
   syncQuizAttempt(attempt);
 }
 
+/** Returns all quiz attempts for the given user. */
 export function getQuizAttempts(userId: string): QuizAttempt[] {
   if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_PREFIX + 'attempts_' + userId);
-  return data ? JSON.parse(data) : [];
+  return safeParse<QuizAttempt[]>(
+    localStorage.getItem(STORAGE_PREFIX + 'attempts_' + userId),
+    []
+  );
 }
 
 // Essay attempts
+
+/** Appends an essay attempt to localStorage and syncs to Supabase. */
 export function saveEssayAttempt(attempt: EssayAttempt): void {
   const attempts = getEssayAttempts(attempt.userId);
   attempts.push(attempt);
@@ -65,12 +93,19 @@ export function saveEssayAttempt(attempt: EssayAttempt): void {
   syncEssayAttempt(attempt);
 }
 
+/** Returns all essay attempts for the given user. */
 export function getEssayAttempts(userId: string): EssayAttempt[] {
   if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_PREFIX + 'essay_' + userId);
-  return data ? JSON.parse(data) : [];
+  return safeParse<EssayAttempt[]>(
+    localStorage.getItem(STORAGE_PREFIX + 'essay_' + userId),
+    []
+  );
 }
 
+/**
+ * Returns a map of questionId → best EssayAttempt for the given user and chapter.
+ * "Best" is determined by highest score.
+ */
 export function getBestEssayAttempts(userId: string, chapter: number): Record<string, EssayAttempt> {
   const attempts = getEssayAttempts(userId).filter(a => a.chapter === chapter);
   const best: Record<string, EssayAttempt> = {};
@@ -83,6 +118,8 @@ export function getBestEssayAttempts(userId: string, chapter: number): Record<st
 }
 
 // Progress tracking
+
+/** Computes full UserProgress from localStorage for the given user. */
 export function getUserProgress(userId: string): UserProgress {
   const attempts = getQuizAttempts(userId);
   const essayAttempts = getEssayAttempts(userId);
@@ -123,6 +160,7 @@ export function getUserProgress(userId: string): UserProgress {
   return { userId, chapterResults };
 }
 
+/** Returns progress for all users stored in localStorage. */
 export function getAllProgress(): { user: UserProfile; progress: UserProgress }[] {
   const users = getAllUsers();
   return users.map(user => ({
@@ -131,6 +169,7 @@ export function getAllProgress(): { user: UserProfile; progress: UserProgress }[
   }));
 }
 
+/** Returns the percentage of chapters passed (0–100). */
 export function getCompletionPercentage(progress: UserProgress): number {
   const total = 17; // chapters 0-16
   const passed = Object.values(progress.chapterResults).filter(r => r.passed).length;
