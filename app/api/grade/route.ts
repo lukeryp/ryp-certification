@@ -3,6 +3,10 @@ import { CHAPTERS } from '../../lib/chapters';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
+/** Maximum character lengths accepted for each string field (H-1). */
+const MAX_RESPONSE_CHARS = 10_000;
+const MAX_FIELD_CHARS = 2_000;
+
 const SCORE_RUBRIC = `
 Score rubric (1–10):
 - 1–3: Misunderstands the core mechanism. The student confuses surface symptoms with root causes, or paraphrases back the question without engaging the underlying principle.
@@ -37,6 +41,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
+  // H-1: Enforce input length limits to prevent quota abuse
+  if (typeof response !== 'string' || response.length > MAX_RESPONSE_CHARS) {
+    return NextResponse.json({ error: `Response must not exceed ${MAX_RESPONSE_CHARS} characters` }, { status: 400 });
+  }
+  if (typeof question !== 'string' || question.length > MAX_FIELD_CHARS) {
+    return NextResponse.json({ error: `Question must not exceed ${MAX_FIELD_CHARS} characters` }, { status: 400 });
+  }
+  if (!Number.isInteger(chapter) || chapter < 0) {
+    return NextResponse.json({ error: 'chapter must be a non-negative integer' }, { status: 400 });
+  }
+
   if (response.trim().length < 20) {
     return NextResponse.json({ error: 'Response too short to grade' }, { status: 400 });
   }
@@ -46,8 +61,8 @@ export async function POST(req: NextRequest) {
     ? `Chapter ${chapterInfo.number}: "${chapterInfo.title}"\n${chapterInfo.summary}\n\nKey concepts covered in this chapter:\n${chapterInfo.keyConcepts.map((c, i) => `${i + 1}. ${c}`).join('\n')}`
     : `Chapter ${chapter}`;
 
-  const criteriaList = gradingCriteria.length > 0
-    ? `\nGrading criteria for this question:\n${gradingCriteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}`
+  const criteriaList = Array.isArray(gradingCriteria) && gradingCriteria.length > 0
+    ? `\nGrading criteria for this question:\n${gradingCriteria.slice(0, 20).map((c, i) => `${i + 1}. ${String(c).slice(0, 500)}`).join('\n')}`
     : '';
 
   const systemPrompt = `You are a deeply knowledgeable instructor for the RYP (Rewire Your Practice) golf methodology. You are grading a student's written response to a discussion question.
@@ -84,8 +99,8 @@ IMPORTANT OUTPUT FORMAT: You must respond with ONLY valid JSON. No markdown, no 
     });
 
     if (!anthropicRes.ok) {
-      const err = await anthropicRes.text();
-      console.error('Anthropic API error:', err);
+      // H-4: Log only the status code — do not emit the response body to logs
+      console.error('Anthropic API error status:', anthropicRes.status);
       return NextResponse.json({ error: 'AI grading service unavailable' }, { status: 502 });
     }
 
@@ -99,7 +114,7 @@ IMPORTANT OUTPUT FORMAT: You must respond with ONLY valid JSON. No markdown, no 
       // Attempt to extract JSON from within the response text
       const match = rawContent.match(/\{[\s\S]*\}/);
       if (!match) {
-        console.error('Could not parse AI response:', rawContent);
+        console.error('Could not parse AI grading response (no JSON found)');
         return NextResponse.json({ error: 'Failed to parse grading response' }, { status: 502 });
       }
       parsed = JSON.parse(match[0]);
@@ -112,7 +127,7 @@ IMPORTANT OUTPUT FORMAT: You must respond with ONLY valid JSON. No markdown, no 
       suggestions: String(parsed.suggestions),
     });
   } catch (err) {
-    console.error('Grade route error:', err);
+    console.error('Grade route error:', err instanceof Error ? err.message : 'unknown');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
