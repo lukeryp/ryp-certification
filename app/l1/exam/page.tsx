@@ -10,7 +10,6 @@ import {
   L1_ESSAYS,
   L1_SECTIONS,
   L1_MC_POINTS,
-  L1_ESSAY_POINTS,
   L1_PASS_THRESHOLD,
   L1_TIME_LIMIT,
   CertQuestion,
@@ -47,6 +46,7 @@ interface EssayState {
   score: number | null;
   feedback: string;
   suggestions: string;
+  error: string;
 }
 
 function countWords(text: string): number {
@@ -79,6 +79,7 @@ export default function L1ExamPage() {
       score: null,
       feedback: '',
       suggestions: '',
+      error: '',
     }))
   );
   const [currentEssay, setCurrentEssay] = useState(0);
@@ -175,7 +176,16 @@ export default function L1ExamPage() {
           response: state.text,
         }),
       });
-      const data = await res.json();
+      // M-3: wrap res.json() in try-catch — server may return non-JSON on errors
+      let data: { score?: number; feedback?: string; suggestions?: string; error?: string };
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('The grading server returned an unexpected response. Please try again.');
+      }
+      if (!res.ok) {
+        throw new Error(data.error || 'Grading failed. Please try again.');
+      }
       setEssays(prev => prev.map((e, i) =>
         i === idx ? {
           ...e,
@@ -184,11 +194,17 @@ export default function L1ExamPage() {
           score: data.score ?? 0,
           feedback: data.feedback ?? '',
           suggestions: data.suggestions ?? '',
+          error: '',
         } : e
       ));
-    } catch {
+    } catch (err) {
+      // M-2: surface the error to the student instead of failing silently
       setEssays(prev => prev.map((e, i) =>
-        i === idx ? { ...e, grading: false } : e
+        i === idx ? {
+          ...e,
+          grading: false,
+          error: err instanceof Error ? err.message : 'Grading failed. Please try again.',
+        } : e
       ));
     }
   };
@@ -456,13 +472,16 @@ export default function L1ExamPage() {
                 </div>
               </div>
 
+              {state.error && (
+                <p className="text-red-400 text-sm mb-3 px-1">{state.error}</p>
+              )}
               <button
                 onClick={() => handleSubmitEssay(currentEssay)}
                 disabled={state.grading || state.wordCount < 20}
                 className="w-full py-3 rounded-xl font-semibold text-[#0d0d0d] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #00af51, #00d466)' }}
               >
-                {state.grading ? 'Grading...' : 'Submit Essay for AI Grading'}
+                {state.grading ? 'Grading...' : state.error ? 'Retry Submission' : 'Submit Essay for AI Grading'}
               </button>
             </>
           ) : (

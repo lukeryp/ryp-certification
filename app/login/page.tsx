@@ -13,7 +13,9 @@ function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/l3';
+  const rawRedirect = searchParams.get('redirect') || '/l3';
+  // Reject external URLs and protocol-relative URLs to prevent open redirect
+  const redirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/l3';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ function LoginForm() {
         id: crypto.randomUUID(),
         email: emailLower,
         name: name.trim(),
-        role: emailLower === 'luke.benoit@gmail.com' ? 'admin' as const : 'student' as const,
+        role: emailLower === (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? '').toLowerCase() && emailLower !== '' ? 'admin' as const : 'student' as const,
       };
     }
 
