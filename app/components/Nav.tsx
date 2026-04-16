@@ -77,15 +77,29 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
                 className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname.includes('/leaderboard') ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
                 Cohort
               </Link>
-              <button
-                onClick={() => { logout(); router.push('/login'); }}
-                className="text-[11px] px-3 py-1.5 rounded-lg text-[#888] hover:text-[#141f0f] transition-colors ml-1">
-                Sign Out
-              </button>
             </>
           )}
-          {!level && (
-            <Link href="/l3"
+          {user && level !== 'l3' && (
+            <>
+              <Link href="/dashboard"
+                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname === '/dashboard' ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
+                Dashboard
+              </Link>
+              <Link href="/hours"
+                className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname === '/hours' ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
+                Hours
+              </Link>
+            </>
+          )}
+          {user && (
+            <button
+              onClick={() => { logout(); router.push('/login'); }}
+              className="text-[11px] px-3 py-1.5 rounded-lg text-[#888] hover:text-[#141f0f] transition-colors ml-1">
+              Sign Out
+            </button>
+          )}
+          {!user && (
+            <Link href="/login"
               className="text-[11px] px-3 py-1.5 rounded-lg text-[#888] hover:text-[#141f0f] transition-colors">
               Sign In
             </Link>

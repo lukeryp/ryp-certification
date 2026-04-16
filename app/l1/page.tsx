@@ -3,6 +3,9 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Nav from '../components/Nav';
+import { getCurrentUser } from '../lib/storage';
+import { syncAuthSessionToProfile } from '../lib/auth';
+import { saveCertAttempt } from '../lib/cert-attempts';
 
 // ============================================================================
 // ICC Junior League — Staff Curriculum & Certification
@@ -661,6 +664,37 @@ export default function L1Page() {
   const passed = score.pct >= PASS_THRESHOLD;
 
   const allAnswered = shuffled.length > 0 && shuffled.every((q) => answers[q.id] !== undefined);
+
+  // Save the attempt to Supabase once, when the user lands on the results screen.
+  // Silent no-op if not logged in or Supabase isn't configured.
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (phase !== 'results' || !submitted || savedRef.current) return;
+    if (shuffled.length === 0) return;
+    savedRef.current = true;
+    (async () => {
+      try {
+        // Prefer Supabase Auth session; fall back to local user
+        const authProfile = await syncAuthSessionToProfile();
+        const user = authProfile ?? getCurrentUser();
+        if (!user) return; // anonymous — don't record
+        const answerPayload: Record<string, number> = {};
+        for (const q of shuffled) {
+          if (answers[q.id] !== undefined) answerPayload[q.id] = answers[q.id];
+        }
+        await saveCertAttempt({
+          userId: user.id,
+          certLevel: 'l1',
+          correct: score.correct,
+          total: score.total,
+          passed,
+          answers: answerPayload,
+        });
+      } catch (e) {
+        console.warn('[L1] saveCertAttempt error', e);
+      }
+    })();
+  }, [phase, submitted, shuffled, answers, score.correct, score.total, passed]);
 
   // -------------------- INTRO --------------------
   if (phase === 'intro') {
