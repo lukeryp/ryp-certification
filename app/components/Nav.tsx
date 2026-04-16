@@ -12,7 +12,7 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
   const user = getCurrentUser();
 
   const levelConfig = {
-    l1: { label: 'Junior Golf Helper', abbr: 'L1' },
+    l1: { label: 'ICC Junior League', abbr: 'L1' },
     l2: { label: 'ICC Instructor', abbr: 'L2' },
     l3: { label: 'Textbook Cert', abbr: 'L3' },
   };
