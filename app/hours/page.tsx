@@ -203,7 +203,7 @@ export default function HoursPage() {
 
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="text-xs text-[#6b7280]" style={{ fontFamily: 'var(--font-work-sans)' }}>
-              Quick values: 1.5, 2, 3, 3.5, 4
+              Enter in 0.25 increments (e.g. 1.25, 1.5, 1.75, 2.0)
             </div>
             <button
               type="submit"
