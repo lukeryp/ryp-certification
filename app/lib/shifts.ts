@@ -152,3 +152,29 @@ export function formatWorkDate(iso: string): string {
   const date = new Date(y, m - 1, d);
   return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
+
+/** Admin: all hours entries across all users, newest first. */
+export async function listAllHoursEntries(): Promise<HoursEntry[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  try {
+    const { data, error } = await sb
+      .from('ryp_hours_entries')
+      .select('*')
+      .order('work_date', { ascending: false });
+    if (error) { console.warn('[shifts] listAll', error); return []; }
+    return (data as HoursEntry[]) ?? [];
+  } catch (e) {
+    console.warn('[shifts] listAll exception', e);
+    return [];
+  }
+}
+
+/** Total hours per user_id. */
+export function totalHoursByUser(entries: HoursEntry[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const e of entries) {
+    map.set(e.user_id, round2((map.get(e.user_id) ?? 0) + Number(e.hours || 0)));
+  }
+  return map;
+}

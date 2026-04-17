@@ -84,6 +84,25 @@ export async function getUserByEmail(email: string): Promise<UserProfile | null>
   }
 }
 
+/** Admin: every registered user, ordered by name. */
+export async function listAllUsers(): Promise<UserProfile[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  try {
+    const { data, error } = await sb.from('ryp_users').select('*').order('name', { ascending: true });
+    if (error) { console.warn('[db] listAllUsers', error); return []; }
+    return (data ?? []).map((d: { id: string; name: string; email: string; role: UserProfile['role'] }) => ({
+      id: d.id,
+      name: d.name,
+      email: d.email,
+      role: d.role,
+    }));
+  } catch (e) {
+    console.warn('[db] listAllUsers exception', e);
+    return [];
+  }
+}
+
 /**
  * Fetch all users + their best quiz/essay scores from Supabase and return
  * the same shape as `getAllProgress()` in storage.ts.

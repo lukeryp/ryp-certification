@@ -89,6 +89,12 @@ export default function Nav({ level }: { level?: 'l1' | 'l2' | 'l3' }) {
                 className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${pathname === '/hours' ? 'text-[#141f0f]' : 'text-[#888] hover:text-[#141f0f]'}`}>
                 Hours
               </Link>
+              {user.role === 'admin' && (
+                <Link href="/admin"
+                  className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors font-semibold ${pathname === '/admin' ? 'text-[#141f0f]' : 'text-[#00af51] hover:text-[#141f0f]'}`}>
+                  Admin
+                </Link>
+              )}
             </>
           )}
           {user && (
