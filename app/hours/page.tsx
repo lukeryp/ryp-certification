@@ -7,14 +7,15 @@ import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/storage';
 import { syncAuthSessionToProfile } from '../lib/auth';
 import {
-  clockIn,
-  clockOut,
-  getOpenShift,
-  getUserShifts,
-  summarizeShifts,
-  formatDuration,
-  type Shift,
-  type ShiftStats,
+  addHoursEntry,
+  deleteHoursEntry,
+  getUserHoursEntries,
+  summarizeHours,
+  formatHours,
+  formatWorkDate,
+  todayLocalISO,
+  type HoursEntry,
+  type HoursStats,
 } from '../lib/shifts';
 import type { UserProfile } from '../lib/types';
 
@@ -22,12 +23,15 @@ export default function HoursPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [shifts, setShifts] = useState<Shift[]>([]);
-  const [open, setOpen] = useState<Shift | null>(null);
+  const [entries, setEntries] = useState<HoursEntry[]>([]);
   const [busy, setBusy] = useState(false);
-  const [now, setNow] = useState<number>(() => Date.now());
 
-  // Boot: pick up Supabase Auth if present, else fall back to local user
+  // Form state
+  const [workDate, setWorkDate] = useState(todayLocalISO());
+  const [hoursStr, setHoursStr] = useState('');
+  const [notes, setNotes] = useState('');
+  const [formError, setFormError] = useState('');
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -39,61 +43,53 @@ export default function HoursPage() {
         return;
       }
       setUser(u);
-      const [s, o] = await Promise.all([getUserShifts(u.id), getOpenShift(u.id)]);
+      const e = await getUserHoursEntries(u.id);
       if (cancelled) return;
-      setShifts(s);
-      setOpen(o);
+      setEntries(e);
       setLoading(false);
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [router]);
 
-  // Live timer while a shift is open
-  useEffect(() => {
-    if (!open) return;
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [open]);
+  const stats: HoursStats = useMemo(() => summarizeHours(entries), [entries]);
 
-  const stats: ShiftStats = useMemo(
-    () => summarizeShifts(shifts, open),
-    // recompute every 60s while open via `now`
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shifts, open, now],
-  );
-
-  const openElapsed = open
-    ? formatDuration(Math.max(0, Math.round((now - new Date(open.clock_in).getTime()) / 60000)))
-    : null;
-
-  const handleClockIn = useCallback(async () => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
     if (!user) return;
-    setBusy(true);
-    const s = await clockIn(user.id);
-    if (s) setOpen(s);
-    setBusy(false);
-  }, [user]);
+    const hoursNum = Number(hoursStr);
+    if (!workDate) { setFormError('Pick a date.'); return; }
+    if (!hoursNum || hoursNum <= 0) { setFormError('Enter hours worked (e.g. 3.5).'); return; }
+    if (hoursNum > 24) { setFormError('That’s more than 24 hours in a day.'); return; }
 
-  const handleClockOut = useCallback(async () => {
-    if (!user) return;
     setBusy(true);
-    const closed = await clockOut(user.id);
-    if (closed) {
-      setOpen(null);
-      // Refresh list
-      const s = await getUserShifts(user.id);
-      setShifts(s);
+    const row = await addHoursEntry({
+      userId: user.id,
+      workDate,
+      hours: hoursNum,
+      notes: notes.trim() || undefined,
+    });
+    if (row) {
+      setEntries((prev) => [row, ...prev]);
+      setHoursStr('');
+      setNotes('');
+    } else {
+      setFormError('Couldn’t save that entry — try again.');
     }
     setBusy(false);
+  }, [user, workDate, hoursStr, notes]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!user) return;
+    const ok = await deleteHoursEntry(id, user.id);
+    if (ok) setEntries((prev) => prev.filter((e) => e.id !== id));
   }, [user]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#9ca3af] flex items-center justify-center"
         style={{ fontFamily: 'var(--font-work-sans)' }}>
-        Loading your shifts…
+        Loading your hours…
       </div>
     );
   }
@@ -112,7 +108,7 @@ export default function HoursPage() {
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white"
               style={{ fontFamily: 'var(--font-raleway)' }}>
-              {user?.name?.split(' ')[0] ?? 'Staff'} — Clock In / Out
+              {user?.name?.split(' ')[0] ?? 'Staff'} — Log Hours
             </h1>
             <p className="text-sm text-[#9ca3af] mt-1"
               style={{ fontFamily: 'var(--font-work-sans)' }}>
@@ -124,97 +120,126 @@ export default function HoursPage() {
           </Link>
         </div>
 
-        {/* Clock card */}
-        <div
-          className="rounded-2xl p-6 sm:p-8 mb-8"
+        {/* Log hours form */}
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-2xl p-6 sm:p-7 mb-8"
           style={{
-            background: open
-              ? 'linear-gradient(135deg, rgba(0,175,81,0.18), rgba(0,175,81,0.08))'
-              : 'rgba(255,255,255,0.03)',
-            border: open ? '1px solid rgba(0,175,81,0.45)' : '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
           }}
         >
-          {open ? (
+          <div className="text-xs uppercase tracking-[0.2em] text-[#9ca3af] mb-4"
+            style={{ fontFamily: 'var(--font-raleway)' }}>
+            Log a shift
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3 mb-3">
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#00d466] mb-2"
-                style={{ fontFamily: 'var(--font-raleway)' }}>
-                On the clock
-              </div>
-              <div className="text-5xl sm:text-6xl font-black text-white tracking-tight"
-                style={{ fontFamily: 'var(--font-raleway)' }}>
-                {openElapsed}
-              </div>
-              <div className="text-sm text-[#9ca3af] mt-2"
-                style={{ fontFamily: 'var(--font-work-sans)' }}>
-                Started {formatClockTime(open.clock_in)}
-              </div>
-              <button
-                onClick={handleClockOut}
-                disabled={busy}
-                className="mt-6 px-6 py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#9ca3af] mb-1.5">
+                Date
+              </label>
+              <input
+                type="date"
+                value={workDate}
+                onChange={(e) => setWorkDate(e.target.value)}
+                max={todayLocalISO()}
+                className="w-full px-4 py-3 rounded-xl text-white text-sm outline-none"
                 style={{
-                  background: '#f4ee19',
-                  color: '#0d0d0d',
-                  fontFamily: 'var(--font-raleway)',
-                  letterSpacing: '2px',
-                  textTransform: 'uppercase',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  fontFamily: 'var(--font-work-sans)',
+                  colorScheme: 'dark',
                 }}
-              >
-                Clock Out
-              </button>
+              />
             </div>
-          ) : (
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#9ca3af] mb-2"
-                style={{ fontFamily: 'var(--font-raleway)' }}>
-                Not clocked in
-              </div>
-              <div className="text-3xl sm:text-4xl font-black text-white"
-                style={{ fontFamily: 'var(--font-raleway)' }}>
-                Ready to start your shift?
-              </div>
-              <p className="text-sm text-[#9ca3af] mt-2"
-                style={{ fontFamily: 'var(--font-work-sans)' }}>
-                Hit Clock In when you arrive. Clock Out when you leave. Your totals update live.
-              </p>
-              <button
-                onClick={handleClockIn}
-                disabled={busy}
-                className="mt-6 px-6 py-3 rounded-xl text-sm font-bold text-[#0d0d0d] transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#9ca3af] mb-1.5">
+                Hours
+              </label>
+              <input
+                type="number"
+                inputMode="decimal"
+                step="0.25"
+                min="0"
+                max="24"
+                placeholder="3.5"
+                value={hoursStr}
+                onChange={(e) => setHoursStr(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl text-white text-sm outline-none placeholder-[#4b5563]"
                 style={{
-                  background: 'linear-gradient(135deg, #00af51, #00d466)',
-                  fontFamily: 'var(--font-raleway)',
-                  letterSpacing: '2px',
-                  textTransform: 'uppercase',
-                  boxShadow: '0 10px 40px -10px rgba(0,175,81,0.5)',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  fontFamily: 'var(--font-work-sans)',
                 }}
-              >
-                Clock In
-              </button>
+              />
             </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#9ca3af] mb-1.5">
+              Notes (optional)
+            </label>
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Tuesday session – 6 kids on the range"
+              className="w-full px-4 py-3 rounded-xl text-white text-sm outline-none placeholder-[#4b5563]"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                fontFamily: 'var(--font-work-sans)',
+              }}
+            />
+          </div>
+
+          {formError && (
+            <p className="text-sm text-red-400 mb-3" style={{ fontFamily: 'var(--font-work-sans)' }}>
+              {formError}
+            </p>
           )}
-        </div>
+
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-xs text-[#6b7280]" style={{ fontFamily: 'var(--font-work-sans)' }}>
+              Quick values: 1.5, 2, 3, 3.5, 4
+            </div>
+            <button
+              type="submit"
+              disabled={busy}
+              className="px-6 py-3 rounded-xl text-sm font-bold text-[#0d0d0d] transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+              style={{
+                background: 'linear-gradient(135deg, #00af51, #00d466)',
+                fontFamily: 'var(--font-raleway)',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                boxShadow: '0 10px 40px -10px rgba(0,175,81,0.5)',
+              }}
+            >
+              Save Hours
+            </button>
+          </div>
+        </form>
 
         {/* Totals */}
         <div className="grid grid-cols-3 gap-3 mb-10">
-          <StatCard label="This week" value={formatDuration(stats.weekMinutes)} />
-          <StatCard label="Last 30 days" value={formatDuration(stats.monthMinutes)} />
-          <StatCard label="All time" value={formatDuration(stats.totalMinutes)} accent />
+          <StatCard label="This week" value={formatHours(stats.weekHours)} />
+          <StatCard label="Last 30 days" value={formatHours(stats.monthHours)} />
+          <StatCard label="All time" value={formatHours(stats.totalHours)} accent />
         </div>
 
-        {/* Shift history */}
+        {/* History */}
         <div>
           <div className="flex items-baseline justify-between mb-3">
             <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-[#9ca3af]"
               style={{ fontFamily: 'var(--font-raleway)' }}>
-              Recent Shifts
+              Logged Hours
             </h2>
-            <span className="text-xs text-[#6b7280]">{stats.completedCount} completed</span>
+            <span className="text-xs text-[#6b7280]">{stats.entryCount} entries</span>
           </div>
 
-          {shifts.length === 0 && !open ? (
+          {entries.length === 0 ? (
             <div
               className="rounded-xl p-6 text-sm text-[#9ca3af]"
               style={{
@@ -223,12 +248,12 @@ export default function HoursPage() {
                 fontFamily: 'var(--font-work-sans)',
               }}
             >
-              No shifts logged yet. Clock in above to start tracking.
+              No hours logged yet. Use the form above to add your first shift.
             </div>
           ) : (
             <div className="space-y-2">
-              {shifts.map((s) => (
-                <ShiftRow key={s.id} shift={s} />
+              {entries.map((e) => (
+                <EntryRow key={e.id} entry={e} onDelete={() => handleDelete(e.id)} />
               ))}
             </div>
           )}
@@ -261,36 +286,41 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
-function ShiftRow({ shift }: { shift: Shift }) {
-  const duration = shift.duration_minutes ?? 0;
-  const open = !shift.clock_out;
+function EntryRow({ entry, onDelete }: { entry: HoursEntry; onDelete: () => void }) {
   return (
     <div
-      className="rounded-xl px-4 py-3 flex items-center justify-between"
+      className="rounded-xl px-4 py-3 flex items-center justify-between gap-3"
       style={{
         background: 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(255,255,255,0.06)',
         fontFamily: 'var(--font-work-sans)',
       }}
     >
-      <div>
+      <div className="min-w-0 flex-1">
         <div className="text-sm text-white">
-          {formatDate(shift.clock_in)}
+          {formatWorkDate(entry.work_date)}
+          {entry.location ? <span className="text-[#6b7280]"> · {entry.location}</span> : null}
         </div>
-        <div className="text-xs text-[#9ca3af] mt-0.5">
-          {formatClockTime(shift.clock_in)}
-          {shift.clock_out ? ` → ${formatClockTime(shift.clock_out)}` : ' → open'}
-          {shift.location ? ` · ${shift.location}` : ''}
-        </div>
+        {entry.notes ? (
+          <div className="text-xs text-[#9ca3af] mt-0.5 truncate">{entry.notes}</div>
+        ) : null}
       </div>
-      <div
-        className="text-sm font-bold"
-        style={{
-          color: open ? '#f4ee19' : '#00d466',
-          fontFamily: 'var(--font-raleway)',
-        }}
-      >
-        {open ? 'OPEN' : formatDuration(duration)}
+      <div className="flex items-center gap-3 shrink-0">
+        <div
+          className="text-sm font-bold"
+          style={{ color: '#00d466', fontFamily: 'var(--font-raleway)' }}
+        >
+          {formatHours(entry.hours)}
+        </div>
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label="Delete entry"
+          className="text-[11px] text-[#6b7280] hover:text-red-400 transition-colors px-2 py-1 rounded"
+          style={{ fontFamily: 'var(--font-work-sans)' }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
@@ -313,14 +343,4 @@ function GridBackground() {
       />
     </>
   );
-}
-
-function formatClockTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }

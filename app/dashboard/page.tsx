@@ -7,12 +7,12 @@ import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/storage';
 import { signOutEverywhere, syncAuthSessionToProfile } from '../lib/auth';
 import {
-  getUserShifts,
-  getOpenShift,
-  summarizeShifts,
-  formatDuration,
-  type Shift,
-  type ShiftStats,
+  getUserHoursEntries,
+  summarizeHours,
+  formatHours,
+  formatWorkDate,
+  type HoursEntry,
+  type HoursStats,
 } from '../lib/shifts';
 import { getBestCertAttempt, type CertAttempt } from '../lib/cert-attempts';
 import type { UserProfile } from '../lib/types';
@@ -21,10 +21,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [shifts, setShifts] = useState<Shift[]>([]);
-  const [open, setOpen] = useState<Shift | null>(null);
+  const [entries, setEntries] = useState<HoursEntry[]>([]);
   const [l1Best, setL1Best] = useState<CertAttempt | null>(null);
-  const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
     let cancelled = false;
@@ -37,14 +35,12 @@ export default function DashboardPage() {
         return;
       }
       setUser(u);
-      const [s, o, l1] = await Promise.all([
-        getUserShifts(u.id),
-        getOpenShift(u.id),
+      const [e, l1] = await Promise.all([
+        getUserHoursEntries(u.id),
         getBestCertAttempt(u.id, 'l1'),
       ]);
       if (cancelled) return;
-      setShifts(s);
-      setOpen(o);
+      setEntries(e);
       setL1Best(l1);
       setLoading(false);
     })();
@@ -53,21 +49,7 @@ export default function DashboardPage() {
     };
   }, [router]);
 
-  useEffect(() => {
-    if (!open) return;
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [open]);
-
-  const stats: ShiftStats = useMemo(
-    () => summarizeShifts(shifts, open),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shifts, open, now],
-  );
-
-  const openElapsed = open
-    ? formatDuration(Math.max(0, Math.round((now - new Date(open.clock_in).getTime()) / 60000)))
-    : null;
+  const stats: HoursStats = useMemo(() => summarizeHours(entries), [entries]);
 
   if (loading) {
     return (
@@ -127,36 +109,6 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Open shift banner */}
-        {open && (
-          <Link
-            href="/hours"
-            className="block mb-6 rounded-2xl p-5 transition-transform hover:scale-[1.01]"
-            style={{
-              background: 'linear-gradient(135deg, rgba(0,175,81,0.18), rgba(0,175,81,0.06))',
-              border: '1px solid rgba(0,175,81,0.45)',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div
-                  className="text-[10px] uppercase tracking-[0.25em] text-[#00d466] mb-1"
-                  style={{ fontFamily: 'var(--font-raleway)' }}
-                >
-                  On the clock
-                </div>
-                <div
-                  className="text-2xl font-black text-white"
-                  style={{ fontFamily: 'var(--font-raleway)' }}
-                >
-                  {openElapsed}
-                </div>
-              </div>
-              <div className="text-xs text-[#9ca3af]">Tap to clock out →</div>
-            </div>
-          </Link>
-        )}
-
         {/* Top row: hours + cert status */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <Link
@@ -177,19 +129,19 @@ export default function DashboardPage() {
               className="text-4xl font-black text-white"
               style={{ fontFamily: 'var(--font-raleway)' }}
             >
-              {formatDuration(stats.weekMinutes)}
+              {formatHours(stats.weekHours)}
             </div>
             <div
               className="mt-3 text-xs text-[#9ca3af]"
               style={{ fontFamily: 'var(--font-work-sans)' }}
             >
-              {formatDuration(stats.monthMinutes)} last 30 · {formatDuration(stats.totalMinutes)} all time
+              {formatHours(stats.monthHours)} last 30 · {formatHours(stats.totalHours)} all time
             </div>
             <div
               className="mt-4 text-xs font-bold text-[#00d466]"
               style={{ fontFamily: 'var(--font-raleway)', letterSpacing: '0.15em' }}
             >
-              {open ? 'CLOCK OUT →' : 'CLOCK IN →'}
+              LOG HOURS →
             </div>
           </Link>
 
@@ -260,21 +212,21 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent shifts */}
+        {/* Recent entries */}
         <div className="mt-6">
           <div className="flex items-baseline justify-between mb-3">
             <h2
               className="text-xs font-bold uppercase tracking-[0.25em] text-[#9ca3af]"
               style={{ fontFamily: 'var(--font-raleway)' }}
             >
-              Recent Shifts
+              Recent Hours
             </h2>
             <Link href="/hours" className="text-xs text-[#9ca3af] hover:text-white transition-colors">
               View all →
             </Link>
           </div>
 
-          {shifts.length === 0 ? (
+          {entries.length === 0 ? (
             <div
               className="rounded-xl p-6 text-sm text-[#9ca3af]"
               style={{
@@ -283,16 +235,16 @@ export default function DashboardPage() {
                 fontFamily: 'var(--font-work-sans)',
               }}
             >
-              No shifts logged yet. Head to{' '}
+              No hours logged yet. Head to{' '}
               <Link href="/hours" className="text-[#00d466] underline">
                 /hours
               </Link>{' '}
-              to clock in.
+              to log your first shift.
             </div>
           ) : (
             <div className="space-y-2">
-              {shifts.slice(0, 5).map((s) => (
-                <ShiftRow key={s.id} shift={s} />
+              {entries.slice(0, 5).map((e) => (
+                <EntryRow key={e.id} entry={e} />
               ))}
             </div>
           )}
@@ -302,9 +254,7 @@ export default function DashboardPage() {
   );
 }
 
-function ShiftRow({ shift }: { shift: Shift }) {
-  const duration = shift.duration_minutes ?? 0;
-  const open = !shift.clock_out;
+function EntryRow({ entry }: { entry: HoursEntry }) {
   return (
     <div
       className="rounded-xl px-4 py-3 flex items-center justify-between"
@@ -314,22 +264,20 @@ function ShiftRow({ shift }: { shift: Shift }) {
         fontFamily: 'var(--font-work-sans)',
       }}
     >
-      <div>
-        <div className="text-sm text-white">{formatDate(shift.clock_in)}</div>
-        <div className="text-xs text-[#9ca3af] mt-0.5">
-          {formatClockTime(shift.clock_in)}
-          {shift.clock_out ? ` → ${formatClockTime(shift.clock_out)}` : ' → open'}
-          {shift.location ? ` · ${shift.location}` : ''}
+      <div className="min-w-0 flex-1">
+        <div className="text-sm text-white">
+          {formatWorkDate(entry.work_date)}
+          {entry.location ? <span className="text-[#6b7280]"> · {entry.location}</span> : null}
         </div>
+        {entry.notes ? (
+          <div className="text-xs text-[#9ca3af] mt-0.5 truncate">{entry.notes}</div>
+        ) : null}
       </div>
       <div
-        className="text-sm font-bold"
-        style={{
-          color: open ? '#f4ee19' : '#00d466',
-          fontFamily: 'var(--font-raleway)',
-        }}
+        className="text-sm font-bold shrink-0"
+        style={{ color: '#00d466', fontFamily: 'var(--font-raleway)' }}
       >
-        {open ? 'OPEN' : formatDuration(duration)}
+        {formatHours(entry.hours)}
       </div>
     </div>
   );
@@ -352,14 +300,4 @@ function GridBackground() {
       />
     </>
   );
-}
-
-function formatClockTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }

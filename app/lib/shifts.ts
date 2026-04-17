@@ -1,162 +1,154 @@
 /**
- * Shift / hours-worked tracking. Writes to the `ryp_shifts` table.
+ * Hours-worked tracking via manual entries.
+ * Writes to the `ryp_hours_entries` table.
  * All functions are fire-and-forget safe and never throw.
  */
 
 import { getSupabase } from './supabase';
 
-export interface Shift {
+export interface HoursEntry {
   id: string;
   user_id: string;
-  clock_in: string;            // ISO
-  clock_out: string | null;    // ISO or null (open shift)
-  duration_minutes: number | null;
+  work_date: string;           // YYYY-MM-DD
+  hours: number;               // decimal hours, e.g. 3.5
   location: string | null;
   notes: string | null;
   created_at: string;
 }
 
-/** Start a new shift for the given user. Fails silently if an open shift already exists. */
-export async function clockIn(userId: string, location: string = 'Meadowbrook'): Promise<Shift | null> {
+export interface AddEntryInput {
+  userId: string;
+  workDate: string;            // YYYY-MM-DD
+  hours: number;               // > 0
+  location?: string;
+  notes?: string;
+}
+
+/** Add a manual hours entry. Returns the row, or null on failure. */
+export async function addHoursEntry(input: AddEntryInput): Promise<HoursEntry | null> {
   const sb = getSupabase();
   if (!sb) return null;
+  const hours = Math.max(0, Number(input.hours));
+  if (!hours || !input.userId || !input.workDate) return null;
   try {
-    // Guard: don't create a second open shift
-    const open = await getOpenShift(userId);
-    if (open) return open;
-
     const id = crypto.randomUUID();
-    const clock_in = new Date().toISOString();
     const { data, error } = await sb
-      .from('ryp_shifts')
-      .insert({ id, user_id: userId, clock_in, location })
-      .select()
-      .single();
-    if (error) { console.warn('[shifts] clockIn', error); return null; }
-    return data as Shift;
-  } catch (e) {
-    console.warn('[shifts] clockIn exception', e);
-    return null;
-  }
-}
-
-/** Close the currently open shift for the given user. */
-export async function clockOut(userId: string, notes?: string): Promise<Shift | null> {
-  const sb = getSupabase();
-  if (!sb) return null;
-  try {
-    const open = await getOpenShift(userId);
-    if (!open) return null;
-    const clock_out = new Date().toISOString();
-    const minutes = Math.max(
-      0,
-      Math.round((new Date(clock_out).getTime() - new Date(open.clock_in).getTime()) / 60000),
-    );
-    const { data, error } = await sb
-      .from('ryp_shifts')
-      .update({
-        clock_out,
-        duration_minutes: minutes,
-        ...(notes ? { notes } : {}),
+      .from('ryp_hours_entries')
+      .insert({
+        id,
+        user_id: input.userId,
+        work_date: input.workDate,
+        hours,
+        location: input.location ?? 'Meadowbrook',
+        notes: input.notes ?? null,
       })
-      .eq('id', open.id)
       .select()
       .single();
-    if (error) { console.warn('[shifts] clockOut', error); return null; }
-    return data as Shift;
+    if (error) { console.warn('[hours] add', error); return null; }
+    return data as HoursEntry;
   } catch (e) {
-    console.warn('[shifts] clockOut exception', e);
+    console.warn('[hours] add exception', e);
     return null;
   }
 }
 
-/** Returns the user's currently open shift, or null. */
-export async function getOpenShift(userId: string): Promise<Shift | null> {
+/** Delete a manual hours entry owned by this user. */
+export async function deleteHoursEntry(id: string, userId: string): Promise<boolean> {
   const sb = getSupabase();
-  if (!sb) return null;
+  if (!sb) return false;
   try {
-    const { data, error } = await sb
-      .from('ryp_shifts')
-      .select('*')
-      .eq('user_id', userId)
-      .is('clock_out', null)
-      .order('clock_in', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) { console.warn('[shifts] getOpenShift', error); return null; }
-    return (data as Shift) ?? null;
+    const { error } = await sb
+      .from('ryp_hours_entries')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+    if (error) { console.warn('[hours] delete', error); return false; }
+    return true;
   } catch (e) {
-    console.warn('[shifts] getOpenShift exception', e);
-    return null;
+    console.warn('[hours] delete exception', e);
+    return false;
   }
 }
 
-/** All shifts for a user, newest first. */
-export async function getUserShifts(userId: string, limit: number = 200): Promise<Shift[]> {
+/** All entries for a user, newest work_date first. */
+export async function getUserHoursEntries(userId: string, limit: number = 500): Promise<HoursEntry[]> {
   const sb = getSupabase();
   if (!sb) return [];
   try {
     const { data, error } = await sb
-      .from('ryp_shifts')
+      .from('ryp_hours_entries')
       .select('*')
       .eq('user_id', userId)
-      .order('clock_in', { ascending: false })
+      .order('work_date', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(limit);
-    if (error) { console.warn('[shifts] getUserShifts', error); return []; }
-    return (data as Shift[]) ?? [];
+    if (error) { console.warn('[hours] get', error); return []; }
+    return ((data ?? []) as HoursEntry[]).map((r) => ({ ...r, hours: Number(r.hours) }));
   } catch (e) {
-    console.warn('[shifts] getUserShifts exception', e);
+    console.warn('[hours] get exception', e);
     return [];
   }
 }
 
-export interface ShiftStats {
-  totalMinutes: number;
-  weekMinutes: number;      // rolling 7 days
-  monthMinutes: number;     // rolling 30 days
-  openShift: Shift | null;
-  completedCount: number;
+export interface HoursStats {
+  totalHours: number;
+  weekHours: number;           // rolling 7 days
+  monthHours: number;          // rolling 30 days
+  entryCount: number;
 }
 
-/** Summary stats across a list of shifts + the open shift (if any). */
-export function summarizeShifts(shifts: Shift[], open: Shift | null): ShiftStats {
+/** Summary totals across a list of entries. */
+export function summarizeHours(entries: HoursEntry[]): HoursStats {
   const now = Date.now();
   const weekMs = 7 * 24 * 3600 * 1000;
   const monthMs = 30 * 24 * 3600 * 1000;
 
-  let totalMinutes = 0;
-  let weekMinutes = 0;
-  let monthMinutes = 0;
-  let completedCount = 0;
+  let totalHours = 0;
+  let weekHours = 0;
+  let monthHours = 0;
 
-  for (const s of shifts) {
-    if (s.clock_out && s.duration_minutes != null) {
-      totalMinutes += s.duration_minutes;
-      completedCount++;
-      const t = new Date(s.clock_in).getTime();
-      if (now - t <= weekMs) weekMinutes += s.duration_minutes;
-      if (now - t <= monthMs) monthMinutes += s.duration_minutes;
-    }
+  for (const e of entries) {
+    const h = Number(e.hours) || 0;
+    totalHours += h;
+    const t = new Date(e.work_date + 'T12:00:00').getTime();
+    if (now - t <= weekMs) weekHours += h;
+    if (now - t <= monthMs) monthHours += h;
   }
 
-  // Count the currently open shift toward the running totals
-  if (open) {
-    const openMin = Math.max(0, Math.round((now - new Date(open.clock_in).getTime()) / 60000));
-    totalMinutes += openMin;
-    const t = new Date(open.clock_in).getTime();
-    if (now - t <= weekMs) weekMinutes += openMin;
-    if (now - t <= monthMs) monthMinutes += openMin;
-  }
-
-  return { totalMinutes, weekMinutes, monthMinutes, openShift: open, completedCount };
+  return {
+    totalHours: round2(totalHours),
+    weekHours: round2(weekHours),
+    monthHours: round2(monthHours),
+    entryCount: entries.length,
+  };
 }
 
-/** "2h 34m" */
-export function formatDuration(minutes: number): string {
-  if (!minutes || minutes < 0) return '0m';
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+/** "3.5h" or "3h 30m"-style display. Prefers decimal hours because that's how users enter them. */
+export function formatHours(hours: number): string {
+  if (!hours || hours < 0) return '0h';
+  // If it's a clean integer, show "3h"
+  if (Number.isInteger(hours)) return `${hours}h`;
+  return `${round2(hours)}h`;
+}
+
+/** Today as a YYYY-MM-DD string in the user's local timezone. */
+export function todayLocalISO(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** Human-readable date from a YYYY-MM-DD string. */
+export function formatWorkDate(iso: string): string {
+  // Interpret as local calendar date (avoid UTC off-by-one)
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) return iso;
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }

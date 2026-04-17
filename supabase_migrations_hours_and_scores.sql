@@ -42,25 +42,20 @@ CREATE INDEX IF NOT EXISTS ryp_cert_attempts_user_idx
   ON ryp_cert_attempts (user_id, cert_level, created_at DESC);
 
 
--- 3. Shifts / hours worked -------------------------------------------------
+-- 3. Manual hours entries (no clock-in/out) --------------------------------
 
-CREATE TABLE IF NOT EXISTS ryp_shifts (
-  id                text PRIMARY KEY,
-  user_id           text NOT NULL,
-  clock_in          timestamptz NOT NULL,
-  clock_out         timestamptz,
-  duration_minutes  int,
-  location          text DEFAULT 'Meadowbrook',
-  notes             text,
-  created_at        timestamptz NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS ryp_hours_entries (
+  id          text PRIMARY KEY,
+  user_id     text NOT NULL,
+  work_date   date NOT NULL,
+  hours       numeric(5,2) NOT NULL,     -- e.g. 3.50
+  location    text DEFAULT 'Meadowbrook',
+  notes       text,
+  created_at  timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS ryp_shifts_user_idx
-  ON ryp_shifts (user_id, clock_in DESC);
-
--- Only one open shift per user at a time
-CREATE UNIQUE INDEX IF NOT EXISTS ryp_shifts_one_open_per_user_idx
-  ON ryp_shifts (user_id) WHERE clock_out IS NULL;
+CREATE INDEX IF NOT EXISTS ryp_hours_entries_user_idx
+  ON ryp_hours_entries (user_id, work_date DESC);
 
 
 -- 4. RLS — mirror existing anon-write pattern used by ryp_users, ryp_quiz_attempts
@@ -72,11 +67,16 @@ DROP POLICY IF EXISTS "allow anon write" ON ryp_cert_attempts;
 CREATE POLICY "allow anon all" ON ryp_cert_attempts
   FOR ALL TO anon USING (true) WITH CHECK (true);
 
-ALTER TABLE ryp_shifts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "allow anon all"   ON ryp_shifts;
-DROP POLICY IF EXISTS "allow anon read"  ON ryp_shifts;
-DROP POLICY IF EXISTS "allow anon write" ON ryp_shifts;
-CREATE POLICY "allow anon all" ON ryp_shifts
+ALTER TABLE ryp_hours_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow anon all"   ON ryp_hours_entries;
+DROP POLICY IF EXISTS "allow anon read"  ON ryp_hours_entries;
+DROP POLICY IF EXISTS "allow anon write" ON ryp_hours_entries;
+CREATE POLICY "allow anon all" ON ryp_hours_entries
   FOR ALL TO anon USING (true) WITH CHECK (true);
+
+
+-- 5. Drop old clock-in/out table if it was created before the switch to manual entries
+
+DROP TABLE IF EXISTS ryp_shifts;
 
 -- Done.
